@@ -212,34 +212,26 @@ After this, your project root should look exactly like the structure shown in Se
    - Folder: `/ (root)`
 
 4. Click **Save**.
-
 5. After about 60 seconds, GitHub shows:
    ```
    Your site is live at https://YOUR-USERNAME.github.io/sstwas/
    ```
 
-Your live URLs will be:
+Project live URLs will be:
 - Landing page: `https://YOUR-USERNAME.github.io/sstwas/`
 - Customer app: `https://YOUR-USERNAME.github.io/sstwas/customer/`
 - Cashier login: `https://YOUR-USERNAME.github.io/sstwas/cashier/login.html`
 - Admin login: `https://YOUR-USERNAME.github.io/sstwas/admin/login.html`
 
-### 7e. Add your GitHub Pages domain to Firebase Auth
-
+### 7e. Add GitHub Pages domain to Firebase Auth
 Without this step, every login attempt on the live site fails with "auth/unauthorized-domain".
-
 1. Firebase Console → **Authentication → Settings tab**.
-
 2. Scroll to **"Authorised domains"**.
-
 3. Click **"Add domain"**.
-
 4. Type: `YOUR-USERNAME.github.io`
-
 5. Click **Add**.
 
 ### 7f. Pushing future changes
-
 Every time you edit a file:
 
 ```bash
