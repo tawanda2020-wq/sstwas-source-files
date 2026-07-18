@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scan Product — SSTWAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/customer.css" />
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header class="flex items-center justify-between p-4">
+    <a href="index.html" class="text-[#4A5568]">&larr;</a>
+    <h1 class="font-semibold text-[#0D1B2A]">Scan a Product</h1>
+    <button id="torch-btn" class="text-[#4A5568]" title="Toggle torch">🔦</button>
+  </header>
+
+  <!-- Scanner viewfinder -->
+  <section id="scan-section" class="px-4">
+    <div id="qr-reader" class="w-full"></div>
+    <p id="scan-prompt" class="text-center text-sm text-[#4A5568] mt-3">Point your camera at a product's QR code</p>
+    <div id="scan-error" class="hidden mt-3 card p-4 text-center text-[#D32F2F] text-sm"></div>
+  </section>
+
+  <!-- Product confirmed card (hidden until a valid scan) -->
+  <section id="product-section" class="hidden px-4 mt-4">
+    <div class="card p-5">
+      <img id="product-image" src="" alt="" class="w-full h-40 object-cover rounded-xl mb-3 bg-gray-100" />
+      <h2 id="product-name" class="text-lg font-bold text-[#0D1B2A]"></h2>
+      <div class="flex items-center justify-between mt-1">
+        <span id="product-price" class="text-[#1A73E8] font-bold text-base"></span>
+        <span id="product-stock" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+      </div>
+
+      <div class="flex items-center justify-center gap-4 my-5">
+        <button id="qty-minus" class="w-10 h-10 rounded-full bg-gray-100 text-xl font-bold">−</button>
+        <span id="qty-value" class="text-xl font-bold w-8 text-center">1</span>
+        <button id="qty-plus" class="w-10 h-10 rounded-full bg-gray-100 text-xl font-bold">+</button>
+      </div>
+
+      <button id="add-cart-btn" class="btn-primary w-full py-3">Add to Cart</button>
+      <button id="scan-next-btn" class="w-full py-3 mt-2 text-sm font-semibold text-[#4A5568]">Scan Next Item</button>
+    </div>
+  </section>
+
+  <footer class="p-4 mt-auto">
+    <a href="cart.html" class="block text-center bg-white border border-gray-200 rounded-xl py-3 font-semibold text-[#0D1B2A] shadow">
+      View Cart 🛒
+    </a>
+  </footer>
+
+  <script type="module">
+    import { getProduct } from "../js/db.js";
+    import { addItem } from "../js/cart.js";
+    import { startScanner, stopScanner, toggleTorch } from "../js/scanner.js";
+
+    const scanSection = document.getElementById("scan-section");
+    const productSection = document.getElementById("product-section");
+    const errorBox = document.getElementById("scan-error");
+    let currentProduct = null;
+    let qty = 1;
+    let torchOn = false;
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove("hidden");
+      setTimeout(() => errorBox.classList.add("hidden"), 2500);
+    }
+
+    function showProductCard(product) {
+      currentProduct = product;
+      qty = 1;
+      document.getElementById("qty-value").textContent = qty;
+      document.getElementById("product-image").src = product.imageUrl || "../assets/icons/placeholder.png";
+      document.getElementById("product-name").textContent = product.name;
+      document.getElementById("product-price").textContent = `$${Number(product.price).toFixed(2)}`;
+      const stockBadge = document.getElementById("product-stock");
+      stockBadge.textContent = `${product.stock} in stock`;
+      stockBadge.className = "text-xs font-semibold px-2 py-0.5 rounded-full " +
+        (product.stock > 10 ? "bg-green-100 text-[#00C853]" : product.stock > 0 ? "bg-amber-100 text-[#FF8F00]" : "bg-red-100 text-[#D32F2F]");
+
+      scanSection.classList.add("hidden");
+      productSection.classList.remove("hidden");
+    }
+
+    async function handleScan(decodedText) {
+      // QR Code Validation Logic Flow (spec section 5.4)
+      const product = await getProduct(decodedText);
+      if (!product) {
+        return showError("Product not recognised — this item does not belong to this store.");
+      }
+      if (product.active === false) {
+        return showError("This product is currently unavailable.");
+      }
+      if (product.stock === 0) {
+        return showError("Out of stock — please inform a staff member.");
+      }
+      showProductCard(product);
+    }
+
+    startScanner("qr-reader", handleScan, () => {}).catch((err) => {
+      showError("Camera access denied or unavailable.");
+      console.error(err);
+    });
+
+    document.getElementById("torch-btn").addEventListener("click", async () => {
+      torchOn = !torchOn;
+      await toggleTorch(torchOn);
+    });
+
+    document.getElementById("qty-minus").addEventListener("click", () => {
+      qty = Math.max(1, qty - 1);
+      document.getElementById("qty-value").textContent = qty;
+    });
+    document.getElementById("qty-plus").addEventListener("click", () => {
+      qty = Math.min(currentProduct.stock, qty + 1);
+      document.getElementById("qty-value").textContent = qty;
+    });
+
+    document.getElementById("add-cart-btn").addEventListener("click", () => {
+      addItem(currentProduct, qty);
+      window.location.href = "cart.html";
+    });
+
+    document.getElementById("scan-next-btn").addEventListener("click", () => {
+      productSection.classList.add("hidden");
+      scanSection.classList.remove("hidden");
+    });
+
+    window.addEventListener("beforeunload", () => stopScanner());
+  </script>
+</body>
+</html>

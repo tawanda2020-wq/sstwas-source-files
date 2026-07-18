@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard — SSTWAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/admin.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body class="min-h-screen bg-[#0D1B2A] flex">
+
+  <!-- Sidebar -->
+  <nav class="w-56 bg-[#0D1B2A] border-r border-gray-700 p-4 hidden md:flex flex-col text-gray-300 text-sm">
+    <h1 class="text-white font-bold mb-6">⚙️ Admin</h1>
+    <button data-panel="products" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📦 Products</button>
+    <button data-panel="qr" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">🔳 QR Generator</button>
+    <button data-panel="inventory" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📊 Inventory</button>
+    <button data-panel="reports" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📈 Reports</button>
+    <button data-panel="users" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">👤 Users</button>
+    <button data-panel="settings" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">🛠 Settings</button>
+    <button id="logout-btn" class="mt-auto text-left py-2 px-3 rounded-lg text-gray-400 border border-gray-700">Logout</button>
+  </nav>
+
+  <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+    <header class="flex justify-between items-center mb-6">
+      <h2 id="panel-title" class="text-white font-bold text-lg">Products</h2>
+      <span id="admin-email" class="text-gray-400 text-xs"></span>
+    </header>
+
+    <!-- Products panel -->
+    <section id="panel-products" class="panel space-y-4">
+      <div class="flex justify-between items-center">
+        <input id="product-search" placeholder="Search products…" class="border border-gray-200 rounded-lg px-3 py-2 text-xs w-56" />
+        <button id="add-product-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">+ Add Product</button>
+      </div>
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-left text-[#4A5568] border-b">
+              <th class="py-2 px-3">Name</th><th class="py-2 px-3">Category</th>
+              <th class="py-2 px-3 text-right">Price</th><th class="py-2 px-3 text-right">Stock</th>
+              <th class="py-2 px-3 text-center">Status</th><th class="py-2 px-3 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- QR panel -->
+    <section id="panel-qr" class="panel hidden space-y-4">
+      <div class="card p-4 max-w-md">
+        <label class="block text-xs font-semibold text-[#4A5568] mb-1">Select Product</label>
+        <select id="qr-product-select" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-4"></select>
+        <div id="qr-output" class="flex justify-center mb-4"></div>
+        <div class="flex gap-2">
+          <button id="qr-download-btn" class="flex-1 bg-[#1A73E8] text-white text-xs font-semibold py-2 rounded-lg">Download PNG</button>
+          <button id="qr-print-btn" class="flex-1 bg-gray-100 text-xs font-semibold py-2 rounded-lg">Print</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inventory panel -->
+    <section id="panel-inventory" class="panel hidden space-y-4">
+      <div class="card p-4 max-w-sm">
+        <label class="block text-xs font-semibold text-[#4A5568] mb-1">Low Stock Alert Threshold</label>
+        <input id="low-stock-threshold" type="number" min="0" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <button id="save-threshold-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save</button>
+      </div>
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead><tr class="text-left text-[#4A5568] border-b"><th class="py-2 px-3">Product</th><th class="py-2 px-3 text-right">Stock</th></tr></thead>
+          <tbody id="inventory-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Reports panel -->
+    <section id="panel-reports" class="panel hidden space-y-4">
+      <div class="flex justify-end">
+        <button id="export-all-csv-btn" class="text-xs font-semibold text-[#1A73E8]">Export All to CSV</button>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4"><h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Payment Method Breakdown</h3><canvas id="pie-chart"></canvas></div>
+        <div class="card p-4"><h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Revenue Over Time</h3><canvas id="bar-chart"></canvas></div>
+      </div>
+      <div class="card p-4">
+        <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Top Products Sold</h3>
+        <ol id="top-products-list" class="text-xs list-decimal list-inside space-y-1"></ol>
+      </div>
+    </section>
+
+    <!-- Users panel -->
+    <section id="panel-users" class="panel hidden space-y-4">
+      <div class="card p-4 max-w-md">
+        <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Add Cashier / Admin Account</h3>
+        <input id="new-user-name" placeholder="Full name" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <input id="new-user-email" type="email" placeholder="Email" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <input id="new-user-password" type="password" placeholder="Temporary password" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <select id="new-user-role" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3">
+          <option value="cashier">Cashier</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button id="add-user-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Create Account</button>
+      </div>
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead><tr class="text-left text-[#4A5568] border-b"><th class="py-2 px-3">Name</th><th class="py-2 px-3">Email</th><th class="py-2 px-3">Role</th></tr></thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Settings panel -->
+    <section id="panel-settings" class="panel hidden space-y-4">
+      <div class="card p-4 max-w-md space-y-3">
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Store Name</label><input id="set-store-name" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Logo URL</label><input id="set-logo-url" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Currency Symbol</label><input id="set-currency" maxlength="3" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Receipt Footer Text</label><textarea id="set-footer" class="w-full border border-gray-200 rounded-lg p-2 text-sm"></textarea></div>
+        <button id="save-settings-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save Settings</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add/Edit Product Modal -->
+  <div id="product-modal-backdrop" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50">
+    <div class="modal-panel w-full max-w-md p-6">
+      <h2 id="product-modal-title" class="font-bold text-[#0D1B2A] mb-3">Add Product</h2>
+      <input id="pm-name" placeholder="Product name" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-category" placeholder="Category" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-price" type="number" step="0.01" placeholder="Price" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-stock" type="number" placeholder="Stock" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-unit" placeholder="Unit (e.g. each, kg)" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-image" placeholder="Image URL" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3" />
+      <div class="flex gap-3">
+        <button id="pm-save-btn" class="flex-1 bg-[#1A73E8] text-white font-bold py-2.5 rounded-lg">Save</button>
+        <button id="pm-cancel-btn" class="flex-1 bg-gray-100 font-bold py-2.5 rounded-lg">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <style>.nav-btn.active{background:#1A73E8;color:#fff;}</style>
+
+  <script type="module">
+    import { requireRole, signOut } from "../js/auth.js";
+    import { auth } from "../js/firebase-config.js";
+    import { getSettings, updateSettings } from "../js/db.js";
+    import {
+      loadProducts, addProduct, editProduct, deleteProduct, toggleActive,
+      renderProductTable, generateQR, downloadQR, loadAnalytics, renderCharts,
+      exportTransactionsToCSV, loadUsers, addCashierAccount
+    } from "../js/admin.js";
+
+    let productsCache = [];
+
+    requireRole(["admin"], "login.html").then(() => {
+      document.getElementById("admin-email").textContent = auth.currentUser.email;
+      init();
+    });
+
+    function init() {
+      // Sidebar nav
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.addEventListener("click", () => switchPanel(btn.dataset.panel));
+      });
+      switchPanel("products");
+
+      loadProducts((products) => {
+        productsCache = products;
+        renderProductTable(products, document.getElementById("products-tbody"), {
+          onEdit: openEditModal,
+          onDelete: handleDelete,
+          onToggle: (id, active) => toggleActive(id, active),
+          onGenerateQR: (id) => { switchPanel("qr"); selectQrProduct(id); }
+        });
+        renderQrSelect(products);
+        renderInventoryTable(products);
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        await signOut();
+        window.location.href = "login.html";
+      });
+
+      wireProductModal();
+      wireQrPanel();
+      wireReportsPanel();
+      wireUsersPanel();
+      wireSettingsPanel();
+
+      document.getElementById("product-search").addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = productsCache.filter((p) => p.name.toLowerCase().includes(term));
+        renderProductTable(filtered, document.getElementById("products-tbody"), {
+          onEdit: openEditModal, onDelete: handleDelete,
+          onToggle: (id, active) => toggleActive(id, active),
+          onGenerateQR: (id) => { switchPanel("qr"); selectQrProduct(id); }
+        });
+      });
+    }
+
+    function switchPanel(name) {
+      document.querySelectorAll(".panel").forEach((p) => p.classList.add("hidden"));
+      document.getElementById(`panel-${name}`).classList.remove("hidden");
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.panel === name));
+      document.getElementById("panel-title").textContent =
+        { products: "Products", qr: "QR Generator", inventory: "Inventory", reports: "Reports", users: "Users", settings: "Settings" }[name];
+      if (name === "reports") loadReports();
+    }
+
+    /* ---------- Product Modal ---------- */
+    let editingId = null;
+    function wireProductModal() {
+      document.getElementById("add-product-btn").addEventListener("click", () => openAddModal());
+      document.getElementById("pm-cancel-btn").addEventListener("click", closeProductModal);
+      document.getElementById("pm-save-btn").addEventListener("click", saveProduct);
+    }
+    function openAddModal() {
+      editingId = null;
+      document.getElementById("product-modal-title").textContent = "Add Product";
+      ["pm-name","pm-category","pm-price","pm-stock","pm-unit","pm-image"].forEach((id) => document.getElementById(id).value = "");
+      document.getElementById("product-modal-backdrop").classList.remove("hidden");
+    }
+    function openEditModal(id) {
+      const p = productsCache.find((x) => x.id === id);
+      if (!p) return;
+      editingId = id;
+      document.getElementById("product-modal-title").textContent = "Edit Product";
+      document.getElementById("pm-name").value = p.name || "";
+      document.getElementById("pm-category").value = p.category || "";
+      document.getElementById("pm-price").value = p.price || "";
+      document.getElementById("pm-stock").value = p.stock || "";
+      document.getElementById("pm-unit").value = p.unit || "";
+      document.getElementById("pm-image").value = p.imageUrl || "";
+      document.getElementById("product-modal-backdrop").classList.remove("hidden");
+    }
+    function closeProductModal() {
+      document.getElementById("product-modal-backdrop").classList.add("hidden");
+    }
+    async function saveProduct() {
+      const data = {
+        name: document.getElementById("pm-name").value.trim(),
+        category: document.getElementById("pm-category").value.trim(),
+        price: parseFloat(document.getElementById("pm-price").value) || 0,
+        stock: parseInt(document.getElementById("pm-stock").value) || 0,
+        unit: document.getElementById("pm-unit").value.trim() || "each",
+        imageUrl: document.getElementById("pm-image").value.trim()
+      };
+      if (!data.name) return alert("Product name is required.");
+      if (editingId) {
+        await editProduct(editingId, data);
+      } else {
+        const id = await addProduct(data);
+        await editProduct(id, { qrCode: id }); // QR value = the product's own Firebase key
+      }
+      closeProductModal();
+    }
+    async function handleDelete(id) {
+      if (confirm("Delete this product permanently?")) await deleteProduct(id);
+    }
+
+    /* ---------- QR Panel ---------- */
+    function renderQrSelect(products) {
+      const select = document.getElementById("qr-product-select");
+      const current = select.value;
+      select.innerHTML = products.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+      if (current) select.value = current;
+    }
+    function selectQrProduct(id) {
+      document.getElementById("qr-product-select").value = id;
+      renderCurrentQr();
+    }
+    function renderCurrentQr() {
+      const id = document.getElementById("qr-product-select").value;
+      if (!id) return;
+      generateQR(id, document.getElementById("qr-output"));
+    }
+    function wireQrPanel() {
+      document.getElementById("qr-product-select").addEventListener("change", renderCurrentQr);
+      document.getElementById("qr-download-btn").addEventListener("click", () => downloadQR(document.getElementById("qr-output")));
+      document.getElementById("qr-print-btn").addEventListener("click", () => window.print());
+    }
+
+    /* ---------- Inventory Panel ---------- */
+    function renderInventoryTable(products) {
+      const tbody = document.getElementById("inventory-tbody");
+      tbody.innerHTML = products
+        .map((p) => {
+          const cls = p.stock > 10 ? "text-[#00C853]" : p.stock > 0 ? "text-[#FF8F00]" : "text-[#D32F2F]";
+          return `<tr class="border-b"><td class="py-1.5 px-3">${p.name}</td><td class="py-1.5 px-3 text-right font-semibold ${cls}">${p.stock}</td></tr>`;
+        })
+        .join("");
+    }
+    document.getElementById("save-threshold-btn").addEventListener("click", async () => {
+      const value = parseInt(document.getElementById("low-stock-threshold").value) || 0;
+      await updateSettings({ lowStockThreshold: value });
+      alert("Threshold saved.");
+    });
+    getSettings().then((s) => {
+      if (s.lowStockThreshold != null) document.getElementById("low-stock-threshold").value = s.lowStockThreshold;
+    });
+
+    /* ---------- Reports Panel ---------- */
+    async function loadReports() {
+      const data = await loadAnalytics();
+      renderCharts(data, document.getElementById("pie-chart"), document.getElementById("bar-chart"));
+      document.getElementById("top-products-list").innerHTML = data.topProducts
+        .map(([name, qty]) => `<li>${name} — ${qty} sold</li>`)
+        .join("");
+      window.__allTxns = data.txns;
+    }
+    function wireReportsPanel() {
+      document.getElementById("export-all-csv-btn").addEventListener("click", () => {
+        exportTransactionsToCSV(window.__allTxns || [], "all-transactions.csv");
+      });
+    }
+
+    /* ---------- Users Panel ---------- */
+    async function refreshUsers() {
+      const users = await loadUsers();
+      document.getElementById("users-tbody").innerHTML = users
+        .map((u) => `<tr class="border-b"><td class="py-1.5 px-3">${u.name || "-"}</td><td class="py-1.5 px-3">${u.email}</td><td class="py-1.5 px-3">${u.role}</td></tr>`)
+        .join("");
+    }
+    function wireUsersPanel() {
+      document.getElementById("add-user-btn").addEventListener("click", async () => {
+        const name = document.getElementById("new-user-name").value.trim();
+        const email = document.getElementById("new-user-email").value.trim();
+        const password = document.getElementById("new-user-password").value;
+        const role = document.getElementById("new-user-role").value;
+        if (!name || !email || password.length < 6) {
+          return alert("Fill all fields — password must be at least 6 characters.");
+        }
+        try {
+          await addCashierAccount(name, email, password, role);
+          document.getElementById("new-user-name").value = "";
+          document.getElementById("new-user-email").value = "";
+          document.getElementById("new-user-password").value = "";
+          refreshUsers();
+        } catch (err) {
+          alert("Could not create account: " + err.message);
+        }
+      });
+      refreshUsers();
+    }
+
+    /* ---------- Settings Panel ---------- */
+    function wireSettingsPanel() {
+      getSettings().then((s) => {
+        document.getElementById("set-store-name").value = s.storeName || "";
+        document.getElementById("set-logo-url").value = s.logoUrl || "";
+        document.getElementById("set-currency").value = s.currencySymbol || "$";
+        document.getElementById("set-footer").value = s.receiptFooter || "";
+      });
+      document.getElementById("save-settings-btn").addEventListener("click", async () => {
+        await updateSettings({
+          storeName: document.getElementById("set-store-name").value.trim(),
+          logoUrl: document.getElementById("set-logo-url").value.trim(),
+          currencySymbol: document.getElementById("set-currency").value.trim() || "$",
+          receiptFooter: document.getElementById("set-footer").value.trim()
+        });
+        alert("Settings saved.");
+      });
+    }
+  </script>
+</body>
+</html>

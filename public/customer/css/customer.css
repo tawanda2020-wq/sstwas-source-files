@@ -1,0 +1,60 @@
+/* customer.css — design tokens + small overrides for the mobile customer app.
+   Tailwind (CDN) handles layout/utility classes; this file holds the brand
+   tokens from the design spec and a few native-app touches Tailwind alone
+   can't express cleanly. */
+
+:root {
+  --color-primary: #1A73E8;
+  --color-success: #00C853;
+  --color-warning: #FF8F00;
+  --color-error: #D32F2F;
+  --color-dark-navy: #0D1B2A;
+  --color-near-white: #F7F9FC;
+  --color-mid-grey: #4A5568;
+
+  --radius-card: 16px;
+  --radius-btn: 8px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--color-near-white);
+  color: var(--color-mid-grey);
+  max-width: 480px;
+  margin: 0 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+}
+
+#qr-reader {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+/* Pending-payment pulse indicator */
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-warning);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+}

@@ -1,0 +1,32 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "products": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
+
+    "transactions": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'cashier' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      "$txnId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || root.child('users').child(auth.uid).child('role').val() === 'cashier' || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+      }
+    },
+
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "settings": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome — SSTWAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/customer.css" />
+<script type="module" src="../js/firebase-config.js"></script>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-6">
+  <div class="flex-1 flex flex-col items-center justify-center text-center">
+    <img src="../assets/logo.png" alt="Store logo" class="h-16 mb-4" onerror="this.style.display='none'" />
+    <h1 class="text-2xl font-bold text-[#0D1B2A] mb-1">Welcome to Self Checkout</h1>
+    <p class="text-sm text-[#4A5568] mb-8">Scan products as you shop. No app to install, no queue to join.</p>
+
+    <div class="grid grid-cols-3 gap-3 mb-8 w-full max-w-xs text-xs text-[#4A5568]">
+      <div class="card p-3">
+        <div class="text-2xl mb-1">📷</div>Scan items
+      </div>
+      <div class="card p-3">
+        <div class="text-2xl mb-1">🛍️</div>Build cart
+      </div>
+      <div class="card p-3">
+        <div class="text-2xl mb-1">💳</div>Pay & go
+      </div>
+    </div>
+  </div>
+
+  <button id="start-btn" class="btn-primary w-full py-4 text-base shadow-lg">
+    Start Shopping
+  </button>
+
+  <script type="module">
+    import { signInCustomer } from "../js/auth.js";
+
+    document.getElementById("start-btn").addEventListener("click", async () => {
+      try {
+        await signInCustomer();
+      } catch (err) {
+        console.warn("Anonymous sign-in failed, continuing without auth:", err);
+      }
+      window.location.href = "scanner.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — SSTWAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/customer.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header class="flex items-center justify-between p-4">
+    <a href="cart.html" id="back-link" class="text-[#4A5568]">&larr;</a>
+    <h1 class="font-semibold text-[#0D1B2A]">Checkout</h1>
+    <span class="w-4"></span>
+  </header>
+
+  <!-- Order summary -->
+  <section id="summary-section" class="px-4">
+    <div class="card p-4 mb-4">
+      <h2 class="text-sm font-semibold text-[#0D1B2A] mb-2">Order Summary</h2>
+      <table class="w-full text-xs text-[#4A5568]" id="summary-table"></table>
+      <div class="flex justify-between border-t border-gray-200 mt-2 pt-2 font-bold text-[#0D1B2A]">
+        <span>Total</span>
+        <span id="summary-total"></span>
+      </div>
+    </div>
+
+    <h2 class="text-sm font-semibold text-[#0D1B2A] mb-2 px-1">Select Payment Method</h2>
+    <div class="space-y-3">
+      <button data-method="ECOCASH" class="method-card w-full card p-4 flex items-center gap-3 text-left">
+        <span class="text-2xl">📱</span>
+        <div><p class="font-semibold text-[#0D1B2A]">EcoCash</p><p class="text-xs text-[#4A5568]">Mobile money (simulated)</p></div>
+      </button>
+      <button data-method="CARD" class="method-card w-full card p-4 flex items-center gap-3 text-left">
+        <span class="text-2xl">💳</span>
+        <div><p class="font-semibold text-[#0D1B2A]">Bank Card</p><p class="text-xs text-[#4A5568]">Visa / Mastercard (simulated)</p></div>
+      </button>
+      <button data-method="CASH" class="method-card w-full card p-4 flex items-center gap-3 text-left">
+        <span class="text-2xl">💵</span>
+        <div><p class="font-semibold text-[#0D1B2A]">Cash</p><p class="text-xs text-[#4A5568]">Pay a cashier in-store</p></div>
+      </button>
+    </div>
+  </section>
+
+  <!-- EcoCash form -->
+  <section id="ecocash-section" class="hidden px-4">
+    <div class="card p-5">
+      <h2 class="font-semibold text-[#0D1B2A] mb-3">EcoCash Payment</h2>
+      <label class="block text-xs font-semibold text-[#4A5568] mb-1">Phone Number</label>
+      <input id="ecocash-phone" type="tel" maxlength="10" placeholder="07XXXXXXXX" class="w-full border border-gray-200 rounded-lg p-3 mb-3 text-sm" />
+      <label class="block text-xs font-semibold text-[#4A5568] mb-1">PIN</label>
+      <input id="ecocash-pin" type="password" maxlength="4" placeholder="••••" class="w-full border border-gray-200 rounded-lg p-3 mb-2 text-sm" />
+      <p class="text-[11px] text-gray-400 mb-4">Demo mode — no real transaction. No data is saved.</p>
+      <button id="ecocash-pay-btn" class="btn-primary w-full py-3">Pay <span id="ecocash-amount"></span></button>
+      <p id="ecocash-error" class="hidden text-xs text-[#D32F2F] mt-2 text-center"></p>
+    </div>
+  </section>
+
+  <!-- Bank Card form -->
+  <section id="card-section" class="hidden px-4">
+    <div class="card p-5">
+      <h2 class="font-semibold text-[#0D1B2A] mb-3">Bank Card Payment</h2>
+      <label class="block text-xs font-semibold text-[#4A5568] mb-1">Card Number</label>
+      <input id="card-number" type="text" maxlength="19" placeholder="1234 5678 9012 3456" class="w-full border border-gray-200 rounded-lg p-3 mb-3 text-sm" />
+      <div class="flex gap-3 mb-3">
+        <div class="flex-1">
+          <label class="block text-xs font-semibold text-[#4A5568] mb-1">Expiry (MM/YY)</label>
+          <input id="card-expiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+        </div>
+        <div class="w-20">
+          <label class="block text-xs font-semibold text-[#4A5568] mb-1">CVV</label>
+          <input id="card-cvv" type="password" maxlength="3" placeholder="123" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+        </div>
+      </div>
+      <label class="block text-xs font-semibold text-[#4A5568] mb-1">Name on Card</label>
+      <input id="card-name" type="text" placeholder="J. Moyo" class="w-full border border-gray-200 rounded-lg p-3 mb-2 text-sm" />
+      <p class="text-[11px] text-gray-400 mb-4">Demo mode — no real transaction. No card data is saved.</p>
+      <button id="card-pay-btn" class="btn-primary w-full py-3">Pay <span id="card-amount"></span></button>
+      <p id="card-error" class="hidden text-xs text-[#D32F2F] mt-2 text-center"></p>
+    </div>
+  </section>
+
+  <!-- Processing overlay -->
+  <div id="processing-overlay" class="hidden fixed inset-0 bg-white/90 flex flex-col items-center justify-center z-50">
+    <div class="pulse-dot mb-4"></div>
+    <p class="text-sm text-[#4A5568]">Processing payment…</p>
+  </div>
+
+  <!-- Cash reference screen -->
+  <section id="cash-section" class="hidden px-6 flex-1 flex flex-col items-center justify-center text-center">
+    <p class="text-sm text-[#4A5568] mb-2">Show this reference to the cashier and pay cash</p>
+    <div class="card p-6 mb-4 w-full">
+      <p id="cash-ref" class="text-2xl font-bold text-[#1A73E8] tracking-wide select-all"></p>
+    </div>
+    <div class="pulse-dot mx-auto mb-2"></div>
+    <p id="cash-status" class="text-xs text-[#FF8F00] font-semibold">Waiting for cashier confirmation…</p>
+  </section>
+
+  <script type="module">
+    import { getCartForTransaction, getTotal } from "../js/cart.js";
+    import { submitOnlinePayment, submitCashPayment, isValidCardNumber } from "../js/payment.js";
+    import { subscribeToTransaction } from "../js/db.js";
+
+    const total = getTotal();
+    const items = getCartForTransaction();
+
+    // Render order summary
+    document.getElementById("summary-table").innerHTML = items
+      .map((i) => `<tr><td class="py-0.5">${i.name} x${i.qty}</td><td class="py-0.5 text-right">$${i.subtotal.toFixed(2)}</td></tr>`)
+      .join("");
+    document.getElementById("summary-total").textContent = `$${total.toFixed(2)}`;
+    document.getElementById("ecocash-amount").textContent = `$${total.toFixed(2)}`;
+    document.getElementById("card-amount").textContent = `$${total.toFixed(2)}`;
+
+    const sections = {
+      summary: document.getElementById("summary-section"),
+      ecocash: document.getElementById("ecocash-section"),
+      card: document.getElementById("card-section"),
+      cash: document.getElementById("cash-section")
+    };
+
+    function showSection(name) {
+      Object.values(sections).forEach((s) => s.classList.add("hidden"));
+      sections[name].classList.remove("hidden");
+    }
+
+    document.querySelectorAll(".method-card").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const method = btn.dataset.method;
+        if (method === "ECOCASH") showSection("ecocash");
+        else if (method === "CARD") showSection("card");
+        else handleCash();
+      });
+    });
+
+    const overlay = document.getElementById("processing-overlay");
+
+    document.getElementById("ecocash-pay-btn").addEventListener("click", async () => {
+      const phone = document.getElementById("ecocash-phone").value.trim();
+      const pin = document.getElementById("ecocash-pin").value.trim();
+      const errorEl = document.getElementById("ecocash-error");
+      if (!/^\d{10}$/.test(phone) || !/^\d{4}$/.test(pin)) {
+        errorEl.textContent = "Enter a valid 10-digit phone number and 4-digit PIN.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+      // Fields cleared immediately — never persisted anywhere
+      document.getElementById("ecocash-phone").value = "";
+      document.getElementById("ecocash-pin").value = "";
+      overlay.classList.remove("hidden");
+      const { txnId } = await submitOnlinePayment("ECOCASH");
+      overlay.classList.add("hidden");
+      window.location.href = `receipt.html?txnId=${txnId}`;
+    });
+
+    document.getElementById("card-pay-btn").addEventListener("click", async () => {
+      const number = document.getElementById("card-number").value;
+      const expiry = document.getElementById("card-expiry").value;
+      const cvv = document.getElementById("card-cvv").value;
+      const errorEl = document.getElementById("card-error");
+
+      if (!isValidCardNumber(number)) {
+        errorEl.textContent = "Invalid card number.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+        errorEl.textContent = "Enter expiry as MM/YY.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+      if (!/^\d{3}$/.test(cvv)) {
+        errorEl.textContent = "Enter a valid 3-digit CVV.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+      // Clear sensitive fields immediately — never persisted anywhere
+      document.getElementById("card-number").value = "";
+      document.getElementById("card-expiry").value = "";
+      document.getElementById("card-cvv").value = "";
+      document.getElementById("card-name").value = "";
+
+      overlay.classList.remove("hidden");
+      const { txnId } = await submitOnlinePayment("CARD");
+      overlay.classList.add("hidden");
+      window.location.href = `receipt.html?txnId=${txnId}`;
+    });
+
+    async function handleCash() {
+      overlay.classList.remove("hidden");
+      const { txnId, paymentRef } = await submitCashPayment();
+      overlay.classList.add("hidden");
+      document.getElementById("cash-ref").textContent = paymentRef;
+      showSection("cash");
+
+      // Real-time: wait for cashier to flip status -> PAID
+      subscribeToTransaction(txnId, (txn) => {
+        if (txn && txn.status === "PAID") {
+          window.location.href = `receipt.html?txnId=${txnId}`;
+        } else if (txn && txn.status === "CANCELLED") {
+          document.getElementById("cash-status").textContent = "Transaction was cancelled. Please scan again.";
+          document.getElementById("cash-status").classList.replace("text-[#FF8F00]", "text-[#D32F2F]");
+        }
+      });
+    }
+  </script>
+</body>
+</html>

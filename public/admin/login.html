@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login — SSTWAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+  <div class="card w-full max-w-sm p-8">
+    <img src="../assets/logo.png" alt="Store logo" class="h-10 mx-auto mb-4" onerror="this.style.display='none'" />
+    <h1 class="text-lg font-bold text-[#0D1B2A] text-center mb-1">Admin Login</h1>
+    <p class="text-xs text-[#4A5568] text-center mb-6">Sign in to manage the store.</p>
+
+    <form id="login-form" class="space-y-3">
+      <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+      <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+      <button type="submit" class="w-full bg-[#1A73E8] text-white font-bold py-3 rounded-lg">Login</button>
+    </form>
+    <p id="login-error" class="hidden text-xs text-[#D32F2F] text-center mt-3"></p>
+  </div>
+
+  <script type="module">
+    import { signInStaff, getUserRole } from "../js/auth.js";
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("login-error");
+      errorEl.classList.add("hidden");
+
+      try {
+        const cred = await signInStaff(email, password);
+        const role = await getUserRole(cred.user.uid);
+        if (role !== "admin") {
+          throw new Error("This account is not authorised for the admin dashboard.");
+        }
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errorEl.textContent = "Invalid email or password, or account is not an admin.";
+        errorEl.classList.remove("hidden");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

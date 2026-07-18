@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSTWAS — Self Service Till Web App System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: #F7F9FC; color: #4A5568; }
+
+  /* Hero background grid pattern */
+  .hero-bg {
+    background-color: #0D1B2A;
+    background-image:
+      linear-gradient(rgba(26,115,232,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,115,232,0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Glowing orb behind the headline */
+  .hero-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -60%);
+    width: 520px; height: 320px;
+    background: radial-gradient(ellipse, rgba(26,115,232,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Step connector line */
+  .step-line {
+    position: absolute;
+    top: 28px; left: calc(50% + 40px);
+    width: calc(100% - 80px);
+    height: 2px;
+    background: linear-gradient(90deg, #1A73E8, #00C853);
+    z-index: 0;
+  }
+
+  /* Feature card hover */
+  .feature-card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(26,115,232,0.13);
+  }
+
+  /* CTA pulse ring on the main button */
+  @keyframes ping-slow {
+    0%   { transform: scale(1);    opacity: 0.5; }
+    80%  { transform: scale(1.35); opacity: 0; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  .btn-ping::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #1A73E8;
+    animation: ping-slow 2.4s ease-out infinite;
+    z-index: -1;
+  }
+
+  @media (max-width: 640px) {
+    .hero-glow { width: 320px; height: 200px; }
+    .step-line { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════╗ -->
+<!-- ║              HERO SECTION                ║ -->
+<!-- ╚══════════════════════════════════════════╝ -->
+<section class="hero-bg relative overflow-hidden min-h-[72vh] flex flex-col items-center justify-center px-6 py-20 text-center">
+  <div class="hero-glow"></div>
+
+  <!-- Pill badge -->
+  <span class="relative inline-flex items-center gap-2 bg-white/10 text-[#93C5FD] border border-[#1A73E8]/40 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
+    <span class="w-1.5 h-1.5 rounded-full bg-[#00C853] animate-pulse"></span>
+    Prototype · Demo mode active
+  </span>
+
+  <!-- Headline -->
+  <h1 class="relative text-white font-extrabold text-4xl sm:text-5xl leading-tight max-w-2xl mb-4">
+    Skip the queue.<br>
+    <span class="text-[#1A73E8]">Scan, pay</span> &amp; walk out.
+  </h1>
+
+  <!-- Sub-headline -->
+  <p class="relative text-gray-400 text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
+    SSTWAS is a self-checkout web app for supermarkets &amp; retail. Customers scan products with their phone camera, choose a payment method, and receive a digital receipt — all without installing anything.
+  </p>
+
+  <!-- Primary CTA -->
+  <a href="customer/index.html" class="btn-ping relative inline-flex items-center gap-3 bg-[#1A73E8] hover:bg-[#1558B0] transition-colors text-white font-bold text-base px-8 py-4 rounded-2xl shadow-lg mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Start Shopping — No Sign-up Needed
+  </a>
+
+  <p class="text-gray-500 text-xs">Opens the customer self-checkout on any smartphone browser</p>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-gray-600 text-[11px] font-medium">
+    <span>Learn how it works</span>
+    <svg class="w-4 h-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗ -->
+<!-- ║           HOW IT WORKS — 3 STEPS        ║ -->
+<!-- ╚══════════════════════════════════════════╝ -->
+<section class="bg-white px-6 py-16">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-xs font-bold text-[#1A73E8] tracking-widest uppercase text-center mb-2">How it works</p>
+    <h2 class="text-2xl font-bold text-[#0D1B2A] text-center mb-12">From shelf to receipt in under 3 minutes</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 relative">
+
+      <!-- Step connector (desktop only, hidden on mobile via CSS) -->
+      <div class="step-line hidden sm:block"></div>
+
+      <!-- Step 1 -->
+      <div class="flex flex-col items-center text-center">
+        <div class="relative z-10 w-14 h-14 rounded-full bg-[#EFF6FF] border-2 border-[#1A73E8] flex items-center justify-center mb-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#1A73E8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21h-3"/><path d="M13 7V3"/><path d="M13 13h4"/><path d="M13 19h4"/><path d="M8 13h1"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-[#1A73E8] uppercase tracking-wider mb-1">Step 1</span>
+        <h3 class="font-bold text-[#0D1B2A] text-base mb-1">Scan</h3>
+        <p class="text-sm text-[#4A5568] leading-relaxed">Open the web app on your phone. Point the camera at any product's QR code to add it to your cart instantly.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flex flex-col items-center text-center">
+        <div class="relative z-10 w-14 h-14 rounded-full bg-[#EFF6FF] border-2 border-[#1A73E8] flex items-center justify-center mb-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#1A73E8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-[#1A73E8] uppercase tracking-wider mb-1">Step 2</span>
+        <h3 class="font-bold text-[#0D1B2A] text-base mb-1">Review &amp; Pay</h3>
+        <p class="text-sm text-[#4A5568] leading-relaxed">Review your cart and choose EcoCash, bank card, or cash. Online payments confirm in seconds; cash customers get a reference number for the cashier.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flex flex-col items-center text-center">
+        <div class="relative z-10 w-14 h-14 rounded-full bg-[#E6F9F0] border-2 border-[#00C853] flex items-center justify-center mb-4 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#00C853]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-[#00C853] uppercase tracking-wider mb-1">Step 3</span>
+        <h3 class="font-bold text-[#0D1B2A] text-base mb-1">Get Your Receipt</h3>
+        <p class="text-sm text-[#4A5568] leading-relaxed">Download a digital receipt as a PNG image, with a full itemised breakdown, transaction reference, and store details.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗ -->
+<!-- ║           FEATURE HIGHLIGHTS            ║ -->
+<!-- ╚══════════════════════════════════════════╝ -->
+<section class="bg-[#F7F9FC] px-6 py-16">
+  <div class="max-w-4xl mx-auto">
+    <p class="text-xs font-bold text-[#1A73E8] tracking-widest uppercase text-center mb-2">What's inside</p>
+    <h2 class="text-2xl font-bold text-[#0D1B2A] text-center mb-10">Three interfaces, one shared database</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="feature-card bg-white rounded-2xl border border-gray-200 p-5 flex flex-col gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#1A73E8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-[#0D1B2A] text-sm mb-1">No Queue</h3>
+          <p class="text-xs text-[#4A5568] leading-relaxed">Customers scan &amp; pay at their own pace with their own phone — without waiting at a staffed till.</p>
+        </div>
+      </div>
+
+      <div class="feature-card bg-white rounded-2xl border border-gray-200 p-5 flex flex-col gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#E6F9F0] flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#00C853]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-[#0D1B2A] text-sm mb-1">Real-time Sync</h3>
+          <p class="text-xs text-[#4A5568] leading-relaxed">Firebase pushes every stock change, payment, and approval instantly to all three interfaces simultaneously.</p>
+        </div>
+      </div>
+
+      <div class="feature-card bg-white rounded-2xl border border-gray-200 p-5 flex flex-col gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#FFF8E6] flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#FF8F00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-[#0D1B2A] text-sm mb-1">Multi-Payment</h3>
+          <p class="text-xs text-[#4A5568] leading-relaxed">EcoCash mobile money, bank card, or in-person cash — all three methods handled in one checkout flow.</p>
+        </div>
+      </div>
+
+      <div class="feature-card bg-white rounded-2xl border border-gray-200 p-5 flex flex-col gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#1A73E8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-[#0D1B2A] text-sm mb-1">Admin Control</h3>
+          <p class="text-xs text-[#4A5568] leading-relaxed">Full product catalogue management, inventory tracking, QR code generation, and sales analytics in one place.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗ -->
+<!-- ║            WHO IS THIS FOR?             ║ -->
+<!-- ╚══════════════════════════════════════════╝ -->
+<section class="bg-white px-6 py-16">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-xs font-bold text-[#1A73E8] tracking-widest uppercase text-center mb-2">Three user roles</p>
+    <h2 class="text-2xl font-bold text-[#0D1B2A] text-center mb-10">Built for everyone in the store</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+      <!-- Customer -->
+      <div class="rounded-2xl border-2 border-[#1A73E8] bg-[#F0F7FF] p-6">
+        <div class="text-3xl mb-3">🛒</div>
+        <h3 class="font-bold text-[#0D1B2A] mb-1">Customer</h3>
+        <p class="text-xs text-[#4A5568] leading-relaxed mb-4">No account. No app. Open the URL, scan products, pay, leave.</p>
+        <ul class="text-xs text-[#4A5568] space-y-1">
+          <li class="flex items-center gap-1.5"><span class="text-[#1A73E8]">✓</span> QR product scanner</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#1A73E8]">✓</span> Cart &amp; checkout</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#1A73E8]">✓</span> Digital receipt download</li>
+        </ul>
+      </div>
+
+      <!-- Cashier -->
+      <div class="rounded-2xl border border-gray-200 bg-white p-6">
+        <div class="text-3xl mb-3">🧾</div>
+        <h3 class="font-bold text-[#0D1B2A] mb-1">Cashier</h3>
+        <p class="text-xs text-[#4A5568] leading-relaxed mb-4">Monitors live pending cash payments and confirms physical cash receipt in real time.</p>
+        <ul class="text-xs text-[#4A5568] space-y-1">
+          <li class="flex items-center gap-1.5"><span class="text-[#00C853]">✓</span> Live pending queue</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#00C853]">✓</span> Payment confirmation</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#00C853]">✓</span> Today's sales view</li>
+        </ul>
+      </div>
+
+      <!-- Admin -->
+      <div class="rounded-2xl border border-gray-200 bg-white p-6">
+        <div class="text-3xl mb-3">⚙️</div>
+        <h3 class="font-bold text-[#0D1B2A] mb-1">Admin</h3>
+        <p class="text-xs text-[#4A5568] leading-relaxed mb-4">Full back-office control over products, users, inventory alerts, and analytics reporting.</p>
+        <ul class="text-xs text-[#4A5568] space-y-1">
+          <li class="flex items-center gap-1.5"><span class="text-[#FF8F00]">✓</span> Product &amp; stock CRUD</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#FF8F00]">✓</span> QR code generator</li>
+          <li class="flex items-center gap-1.5"><span class="text-[#FF8F00]">✓</span> Analytics &amp; CSV export</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗ -->
+<!-- ║           STAFF PORTAL LINKS            ║ -->
+<!-- ╚══════════════════════════════════════════╝ -->
+<section class="bg-[#0D1B2A] px-6 py-14">
+  <div class="max-w-xl mx-auto text-center">
+    <p class="text-gray-400 text-sm mb-6">Staff access</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="cashier/login.html" class="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors text-white border border-white/20 font-semibold text-sm px-6 py-3 rounded-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+        Cashier Login
+      </a>
+      <a href="admin/login.html" class="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors text-white border border-white/20 font-semibold text-sm px-6 py-3 rounded-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Admin Login
+      </a>
+    </div>
+    <p class="text-gray-600 text-xs mt-8">SSTWAS Prototype &nbsp;·&nbsp; All payments are simulated &nbsp;·&nbsp; No real transactions are processed</p>
+  </div>
+</section>
+
+</body>
+</html>

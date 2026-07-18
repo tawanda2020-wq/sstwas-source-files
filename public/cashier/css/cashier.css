@@ -1,0 +1,38 @@
+/* cashier.css — desktop/tablet dashboard tokens shared with admin.css */
+:root {
+  --color-primary: #1A73E8;
+  --color-success: #00C853;
+  --color-warning: #FF8F00;
+  --color-error: #D32F2F;
+  --color-dark-navy: #0D1B2A;
+  --color-near-white: #F7F9FC;
+  --color-mid-grey: #4A5568;
+  --radius-card: 16px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--color-dark-navy);
+  color: var(--color-mid-grey);
+}
+
+.card { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+
+.row-new {
+  animation: rowFlash 1.6s ease-out 2;
+}
+@keyframes rowFlash {
+  0% { background-color: #FFF3E0; }
+  100% { background-color: transparent; }
+}
+
+.modal-backdrop {
+  background: rgba(13, 27, 42, 0.6);
+}
+.modal-panel {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+}
