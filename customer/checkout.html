@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Checkout — SSTWAS</title>
+<title>Checkout - SSTWAS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/customer.css" />
 </head>
@@ -51,7 +51,7 @@
       <input id="ecocash-phone" type="tel" maxlength="10" placeholder="07XXXXXXXX" class="w-full border border-gray-200 rounded-lg p-3 mb-3 text-sm" />
       <label class="block text-xs font-semibold text-[#4A5568] mb-1">PIN</label>
       <input id="ecocash-pin" type="password" maxlength="4" placeholder="••••" class="w-full border border-gray-200 rounded-lg p-3 mb-2 text-sm" />
-      <p class="text-[11px] text-gray-400 mb-4">Demo mode — no real transaction. No data is saved.</p>
+      <p class="text-[11px] text-gray-400 mb-4">...</p>
       <button id="ecocash-pay-btn" class="btn-primary w-full py-3">Pay <span id="ecocash-amount"></span></button>
       <p id="ecocash-error" class="hidden text-xs text-[#D32F2F] mt-2 text-center"></p>
     </div>
@@ -75,7 +75,7 @@
       </div>
       <label class="block text-xs font-semibold text-[#4A5568] mb-1">Name on Card</label>
       <input id="card-name" type="text" placeholder="J. Moyo" class="w-full border border-gray-200 rounded-lg p-3 mb-2 text-sm" />
-      <p class="text-[11px] text-gray-400 mb-4">Demo mode — no real transaction. No card data is saved.</p>
+      <p class="text-[11px] text-gray-400 mb-4">...</p>
       <button id="card-pay-btn" class="btn-primary w-full py-3">Pay <span id="card-amount"></span></button>
       <p id="card-error" class="hidden text-xs text-[#D32F2F] mt-2 text-center"></p>
     </div>
@@ -145,7 +145,7 @@
         errorEl.classList.remove("hidden");
         return;
       }
-      // Fields cleared immediately — never persisted anywhere
+      // Fields cleared immediately - never persisted anywhere
       document.getElementById("ecocash-phone").value = "";
       document.getElementById("ecocash-pin").value = "";
       overlay.classList.remove("hidden");

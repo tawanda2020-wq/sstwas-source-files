@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cashier Dashboard — SSTWAS</title>
+<title>Cashier Dashboard - SSTWAS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/cashier.css" />
 </head>
@@ -138,7 +138,7 @@
         renderPendingTable(txns, document.getElementById("pending-tbody"), openModal);
         document.getElementById("stat-pending").textContent = txns.length;
         wireConfirmButtons();
-        pushNotification(`Pending queue updated — ${txns.length} awaiting payment`, "amber");
+        pushNotification(`Pending queue updated - ${txns.length} awaiting payment`, "amber");
       });
 
       refreshHistory();
@@ -167,7 +167,7 @@
 
       document.getElementById("modal-confirm-btn").onclick = async () => {
         await confirmPayment(txnId, txn.items);
-        pushNotification(`Payment confirmed — ${txn.paymentRef}`, "green");
+        pushNotification(`Payment confirmed - ${txn.paymentRef}`, "green");
         closeModal();
         refreshHistory();
       };
@@ -221,7 +221,7 @@
       const list = document.getElementById("notif-list");
       const li = document.createElement("li");
       li.className = `${colors[color]} rounded-lg p-2`;
-      li.textContent = `${new Date().toLocaleTimeString()} — ${text}`;
+      li.textContent = `${new Date().toLocaleTimeString()} - ${text}`;
       list.prepend(li);
       while (list.children.length > 8) list.removeChild(list.lastChild);
     }

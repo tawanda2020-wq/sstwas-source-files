@@ -150,7 +150,7 @@ This is needed because the Admin Dashboard is where we create other user account
 4. The user appears in the table. Copy the **User UID** from the UID column (it looks like `wX3kLmN8pQr...`).
 ------------------------------------------------------
 **email:**    admin@sstwas.com
-**password:** (@admin2026)
+**password:** @admin2026
 **User UID:** lcWIyzonLpWkboFKBibbP0WLjJQ2
 ------------------------------------------------------
 
@@ -166,7 +166,7 @@ This links the Auth account to a role in the database.
    | Name    | Value                         |
    |---------|-------------------------------|
    | `name ` | `Store Admin`                                    |
-   | `email` | admin@sstwas.com(the email you used in step 6a) | 
+   | `email` | admin@sstwas.com(the email used in step 6a) | 
    | `role`  | `admin`                       |
 
    The finished database structure looks like:
@@ -214,54 +214,41 @@ After this, your project root should look exactly like the structure shown in Se
 4. Click **Save**.
 5. After about 60 seconds, GitHub shows:
    ```
-   Your site is live at https://YOUR-USERNAME.github.io/sstwas/
+   Site is live at https://tawanda2020-wq.github.io/sstwas-source-files/
    ```
 
 Project live URLs will be:
-- Landing page: `https://YOUR-USERNAME.github.io/sstwas/`
-- Customer app: `https://YOUR-USERNAME.github.io/sstwas/customer/`
-- Cashier login: `https://YOUR-USERNAME.github.io/sstwas/cashier/login.html`
-- Admin login: `https://YOUR-USERNAME.github.io/sstwas/admin/login.html`
+- Landing page:  `https://tawanda2020-wq.github.io/sstwas-source-files/sstwas/`
+- Customer app:  `https://tawanda2020-wq.github.io/sstwas-source-files/customer/`
+- Cashier login: `https://tawanda2020-wq.github.io/sstwas-source-files/cashier/login.html`
+- Admin login:   `https://tawanda2020-wq.github.io/sstwas-source-files/admin/login.html`
 
 ### 7e. Add GitHub Pages domain to Firebase Auth
 Without this step, every login attempt on the live site fails with "auth/unauthorized-domain".
-1. Firebase Console → **Authentication → Settings tab**.
+1. Firebase Console > **Authentication > Settings tab**.
 2. Scroll to **"Authorised domains"**.
 3. Click **"Add domain"**.
-4. Type: `YOUR-USERNAME.github.io`
+4. Type: `https://tawanda2020-wq.github.io`
 5. Click **Add**.
 
-### 7f. Pushing future changes
-Every time you edit a file:
-
-```bash
-git add .
-git commit -m "Brief description of what changed"
-git push
-```
-
-GitHub Pages auto-deploys within 30–60 seconds. Hard-refresh the browser (Ctrl+Shift+R) to see the changes.
+GitHub Pages auto-deploys within 30-60 seconds. Hard-refresh the browser (Ctrl+Shift+R) to see the changes.
 
 ---
-
-## 10. Step 8 — Add Products & Generate QR Codes
-
+## 10. Step 8 - Add Products & Generate QR Codes
 ### 8a. Add a product
+1. Open `https://tawanda2020-wq.github.io/sstwas-source-files/admin/login.html` and log in.
 
-1. Open `https://YOUR-USERNAME.github.io/sstwas/admin/login.html` and log in.
-
-2. Sidebar → **Products** → **"+ Add Product"**.
+2. Sidebar -> **Products** -> **"+ Add Product"**.
 
 3. Fill in the form:
-
-   | Field | Example | Notes |
-   |-------|---------|-------|
+   | Field        | Example              | Notes |
+   |--------------|----------------------|-------|
    | Product name | `Full Cream Milk 1L` | Shown to the customer on scan |
-   | Category | `Dairy` | Used for filtering |
-   | Price | `1.50` | Numbers only |
-   | Stock | `48` | Decrements automatically on each sale |
-   | Unit | `each` | Or `kg`, `pack`, `bottle` |
-   | Image URL | `https://...` | Any public image URL, or leave blank |
+   | Category     | `Dairy`              | Used for filtering |
+   | Price        | `1.50` | Numbers only |
+   | Stock        | `48` | Decrements automatically on each sale |
+   | Unit         | `each` | Or `kg`, `pack`, `bottle` |
+   | Image URL    | `https://...` | Any public image URL, or leave blank |
 
 4. Click **Save**.
 

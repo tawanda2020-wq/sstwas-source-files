@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Scan Product — SSTWAS</title>
+<title>Scan Product - SSTWAS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/customer.css" />
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -88,13 +88,13 @@
       // QR Code Validation Logic Flow (spec section 5.4)
       const product = await getProduct(decodedText);
       if (!product) {
-        return showError("Product not recognised — this item does not belong to this store.");
+        return showError("Product not recognised - this item does not belong to this store.");
       }
       if (product.active === false) {
         return showError("This product is currently unavailable.");
       }
       if (product.stock === 0) {
-        return showError("Out of stock — please inform a staff member.");
+        return showError("Out of stock - please inform a staff member.");
       }
       showProductCard(product);
     }
