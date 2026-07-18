@@ -11,16 +11,16 @@ import {
   getAuth
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// TODO: Replace with your own project's config (Firebase Console > Project
+// Project's config (Firebase Console > Project
 // Settings > General > Your apps > SDK setup and configuration).
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCfySJ2zRf7r3X34BQcxRGP0Eh_lTKMsFI",
+  authDomain: "self-service-till-app-2026.firebaseapp.com",
+  databaseURL: "https://self-service-till-app-2026-default-rtdb.firebaseio.com",
+  projectId: "self-service-till-app-2026",
+  storageBucket: "self-service-till-app-2026.firebasestorage.app",
+  messagingSenderId: "508605032179",
+  appId: "1:508605032179:web:65ec0a32309d6c3ba03986"
 };
 
 const app = initializeApp(firebaseConfig);
