@@ -12,9 +12,11 @@ import {
   setUserRecord
 } from "./db.js";
 import {
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  getAuth
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { auth } from "./firebase-config.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { auth, firebaseConfig } from "./firebase-config.js";
 
 /* --------------------------- Products -------------------------------- */
 
@@ -40,7 +42,7 @@ export function toggleActive(id, currentActive) {
 
 export function renderProductTable(products, tbodyEl, { onEdit, onDelete, onToggle, onGenerateQR }) {
   if (products.length === 0) {
-    tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No products yet — add your first one.</td></tr>`;
+    tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No products yet - add your first one.</td></tr>`;
     return;
   }
   tbodyEl.innerHTML = products
@@ -206,7 +208,20 @@ export async function loadUsers() {
 
 /** Creates a Firebase Auth account + matching /users/<uid> record. */
 export async function addCashierAccount(name, email, password, role = "cashier") {
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
+  // Use a secondary Firebase app so creating a new user does NOT sign out
+  // the currently logged-in admin (Firebase signs you in as the newly
+  // created user if you use the primary auth instance).
+  const secondaryAppName = "sstwas-user-creator";
+  const secondaryApp = getApps().find(a => a.name === secondaryAppName)
+    || initializeApp(firebaseConfig, secondaryAppName);
+  const secondaryAuth = getAuth(secondaryApp);
+
+  const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
   await setUserRecord(cred.user.uid, { name, email, role });
+
+  // Sign the secondary app out immediately - we only needed it to create
+  // the account. The primary admin session is completely untouched.
+  await secondaryAuth.signOut();
+
   return cred.user.uid;
 }

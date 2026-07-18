@@ -153,3 +153,8 @@ export function subscribeSettings(callback) {
 export function updateSettings(data) {
   return update(ref(db, "settings"), data);
 }
+
+/** Deletes ALL transactions from the database. Admin-only, irreversible. */
+export function clearAllTransactions() {
+  return set(ref(db, "transactions"), null);
+}

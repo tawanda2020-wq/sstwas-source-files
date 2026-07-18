@@ -1,5 +1,5 @@
 // payment.js
-// Simulated payment flows only — no real payment gateway is integrated.
+// Simulated payment flows only - no real payment gateway is integrated.
 // Implements the exact rules from the design notes: 2s artificial delay,
 // Luhn check for cards, no sensitive data ever persisted.
 
@@ -86,7 +86,7 @@ export async function submitCashPayment() {
     createdAt: Date.now()
   });
 
-  // Cart is intentionally NOT cleared yet — only once payment is confirmed,
+  // Cart is intentionally NOT cleared yet - only once payment is confirmed,
   // so the customer's pending-payment screen still has the cart context.
   return { txnId, paymentRef };
 }
