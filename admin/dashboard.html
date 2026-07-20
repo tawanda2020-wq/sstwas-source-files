@@ -259,23 +259,35 @@
       document.getElementById("product-modal-backdrop").classList.add("hidden");
     }
     async function saveProduct() {
-      const data = {
-        name: document.getElementById("pm-name").value.trim(),
-        category: document.getElementById("pm-category").value.trim(),
-        price: parseFloat(document.getElementById("pm-price").value) || 0,
-        stock: parseInt(document.getElementById("pm-stock").value) || 0,
-        unit: document.getElementById("pm-unit").value.trim() || "each",
-        imageUrl: document.getElementById("pm-image").value.trim()
-      };
-      if (!data.name) return alert("Product name is required.");
-      if (editingId) {
-        await editProduct(editingId, data);
-      } else {
-        const id = await addProduct(data);
-        await editProduct(id, { qrCode: id }); // QR value = the product's own Firebase key
-      }
-      closeProductModal();
+  const data = {
+    name: document.getElementById("pm-name").value.trim(),
+    category: document.getElementById("pm-category").value.trim(),
+    price: parseFloat(document.getElementById("pm-price").value) || 0,
+    stock: parseInt(document.getElementById("pm-stock").value) || 0,
+    unit: document.getElementById("pm-unit").value.trim() || "each",
+    imageUrl: document.getElementById("pm-image").value.trim()
+  };
+  if (!data.name) return alert("Product name is required.");
+
+  const saveBtn = document.getElementById("pm-save-btn");
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
+
+  try {
+    if (editingId) {
+      await editProduct(editingId, data);
+    } else {
+      const id = await addProduct(data);
+      await editProduct(id, { qrCode: id });
     }
+    closeProductModal();
+  } catch (err) {
+    alert("Failed to save product: " + err.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = "Save";
+  }
+}
     async function handleDelete(id) {
       if (confirm("Delete this product permanently?")) await deleteProduct(id);
     }
@@ -366,8 +378,12 @@
           return alert("Fill all fields — password must be at least 6 characters.");
         }
         const errorEl = document.getElementById("add-user-error");
+const addBtn = document.getElementById("add-user-btn");
 errorEl.classList.add("hidden");
 errorEl.textContent = "";
+
+addBtn.disabled = true;
+addBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Creating…`;
 
 try {
   await addCashierAccount(name, email, password, role);
@@ -379,6 +395,9 @@ try {
 } catch (err) {
   errorEl.textContent = err.message;
   errorEl.classList.remove("hidden");
+} finally {
+  addBtn.disabled = false;
+  addBtn.innerHTML = "Create Account";
 }
       });
       refreshUsers();
@@ -387,12 +406,24 @@ try {
     /* ---------- Settings Panel ---------- */
     function wireSettingsPanel() {
        document.getElementById("clear-history-btn").addEventListener("click", async () => {
-    if (!confirm("DELETE ALL transaction history? This cannot be undone.")) return;
-    if (!confirm("Are you absolutely sure? All sales records will be lost.")) return;
+  if (!confirm("DELETE ALL transaction history? This cannot be undone.")) return;
+  if (!confirm("Are you absolutely sure? All sales records will be lost.")) return;
+
+  const btn = document.getElementById("clear-history-btn");
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Clearing…`;
+
+  try {
     await clearAllTransactions();
     window.__allTxns = [];
-    alert("Transaction history cleared.");
-  });
+    btn.innerHTML = "✓ Cleared";
+    setTimeout(() => { btn.innerHTML = "Clear All Transaction History"; btn.disabled = false; }, 2000);
+  } catch (err) {
+    alert("Failed to clear history: " + err.message);
+    btn.disabled = false;
+    btn.innerHTML = "Clear All Transaction History";
+  }
+});
       getSettings().then((s) => {
         document.getElementById("set-store-name").value = s.storeName || "";
         document.getElementById("set-logo-url").value = s.logoUrl || "";
@@ -400,14 +431,25 @@ try {
         document.getElementById("set-footer").value = s.receiptFooter || "";
       });
       document.getElementById("save-settings-btn").addEventListener("click", async () => {
-        await updateSettings({
-          storeName: document.getElementById("set-store-name").value.trim(),
-          logoUrl: document.getElementById("set-logo-url").value.trim(),
-          currencySymbol: document.getElementById("set-currency").value.trim() || "$",
-          receiptFooter: document.getElementById("set-footer").value.trim()
-        });
-        alert("Settings saved.");
-      });
+  const btn = document.getElementById("save-settings-btn");
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
+
+  try {
+    await updateSettings({
+      storeName: document.getElementById("set-store-name").value.trim(),
+      logoUrl: document.getElementById("set-logo-url").value.trim(),
+      currencySymbol: document.getElementById("set-currency").value.trim() || "$",
+      receiptFooter: document.getElementById("set-footer").value.trim()
+    });
+    btn.innerHTML = "✓ Saved";
+    setTimeout(() => { btn.innerHTML = "Save Settings"; }, 2000);
+  } catch (err) {
+    alert("Failed to save: " + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
     }
   </script>
 </body>

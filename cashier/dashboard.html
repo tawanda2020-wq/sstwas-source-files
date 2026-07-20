@@ -166,11 +166,21 @@
       document.getElementById("modal-backdrop").classList.remove("hidden");
 
       document.getElementById("modal-confirm-btn").onclick = async () => {
-        await confirmPayment(txnId, txn.items);
-        pushNotification(`Payment confirmed - ${txn.paymentRef}`, "green");
-        closeModal();
-        refreshHistory();
-      };
+  const confirmBtn = document.getElementById("modal-confirm-btn");
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Confirming…`;
+
+  try {
+    await confirmPayment(txnId, txn.items);
+    pushNotification(`Payment confirmed - ${txn.paymentRef}`, "green");
+    closeModal();
+    refreshHistory();
+  } catch (err) {
+    alert("Failed to confirm payment: " + err.message);
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = "Confirm & Mark as Paid";
+  }
+};
       document.getElementById("modal-cancel-btn").onclick = async () => {
         await cancelTransaction(txnId);
         closeModal();

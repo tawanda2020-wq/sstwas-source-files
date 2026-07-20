@@ -16,7 +16,7 @@
     <form id="login-form" class="space-y-3">
       <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
       <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
-      <button type="submit" class="w-full bg-[#1A73E8] text-white font-bold py-3 rounded-lg">Login</button>
+      <button type="submit" id="login-btn" class="w-full bg-[#1A73E8] text-white font-bold py-3 rounded-lg">Login</button>
     </form>
     <p id="login-error" class="hidden text-xs text-[#D32F2F] text-center mt-3"></p>
   </div>
@@ -25,25 +25,32 @@
     import { signInStaff, getUserRole } from "../js/auth.js";
 
     document.getElementById("login-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const errorEl = document.getElementById("login-error");
-      errorEl.classList.add("hidden");
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorEl = document.getElementById("login-error");
+  const btn = document.getElementById("login-btn");
+  errorEl.classList.add("hidden");
 
-      try {
-        const cred = await signInStaff(email, password);
-        const role = await getUserRole(cred.user.uid);
-        if (role !== "admin") {
-          throw new Error("This account is not authorised for the admin dashboard.");
-        }
-        window.location.href = "dashboard.html";
-      } catch (err) {
-        errorEl.textContent = "Invalid email or password, or account is not an admin.";
-        errorEl.classList.remove("hidden");
-        console.error(err);
-      }
-    });
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Verifying…`;
+
+  try {
+    const cred = await signInStaff(email, password);
+    const role = await getUserRole(cred.user.uid);
+    if (role !== "admin") {
+      throw new Error("This account is not authorised for the admin dashboard.");
+    }
+    btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Redirecting…`;
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    errorEl.textContent = "Invalid email or password, or account is not an admin.";
+    errorEl.classList.remove("hidden");
+    btn.disabled = false;
+    btn.innerHTML = "Login";
+    console.error(err);
+  }
+});
   </script>
 </body>
 </html>

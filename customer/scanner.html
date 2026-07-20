@@ -90,19 +90,32 @@
     }
 
     async function handleScan(decodedText) {
-      // QR Code Validation Logic Flow (spec section 5.4)
-      const product = await getProduct(decodedText);
-      if (!product) {
-        return showError("Product not recognised - this item does not belong to this store.");
-      }
-      if (product.active === false) {
-        return showError("This product is currently unavailable.");
-      }
-      if (product.stock === 0) {
-        return showError("Out of stock - please inform a staff member.");
-      }
-      showProductCard(product);
+  // Show inline loading state while querying Firebase
+  const prompt = document.getElementById("scan-prompt");
+  const originalPrompt = prompt.textContent;
+  prompt.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Checking product…`;
+
+  try {
+    const product = await getProduct(decodedText);
+    if (!product) {
+      prompt.textContent = originalPrompt;
+      return showError("Product not recognised - this item does not belong to this store.");
     }
+    if (product.active === false) {
+      prompt.textContent = originalPrompt;
+      return showError("This product is currently unavailable.");
+    }
+    if (product.stock === 0) {
+      prompt.textContent = originalPrompt;
+      return showError("Out of stock - please inform a staff member.");
+    }
+    prompt.textContent = originalPrompt;
+    showProductCard(product);
+  } catch (err) {
+    prompt.textContent = originalPrompt;
+    showError("Could not reach the database. Check your connection and try again.");
+  }
+}
 
     startScanner("qr-reader", handleScan, () => {}).catch((err) => {
       showError("Camera access denied or unavailable.");
