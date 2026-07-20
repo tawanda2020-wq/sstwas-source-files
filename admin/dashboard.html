@@ -194,9 +194,14 @@
       });
 
       document.getElementById("logout-btn").addEventListener("click", async () => {
+        const confirmLogout = confirm("Are you sure you want to log out?");
+        
+        if (confirmLogout) {
         await signOut();
         window.location.href = "login.html";
-     });
+    }
+    // If Cancel is clicked, nothing happens.
+});
 
       wireProductModal();
       wireQrPanel();
