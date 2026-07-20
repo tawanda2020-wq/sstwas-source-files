@@ -25,13 +25,15 @@ export function addItem(product, qty) {
   const items = readCart();
   const existing = items.find((i) => i.productId === product.id);
   if (existing) {
-    existing.qty += qty;
+    existing.stock = product.stock; // refresh in case stock changed since last scan
+    existing.qty = Math.min(existing.qty + qty, product.stock);
   } else {
     items.push({
       productId: product.id,
       name: product.name,
       unitPrice: product.price,
-      qty
+      stock: product.stock,
+      qty: Math.min(qty, product.stock)
     });
   }
   writeCart(items);

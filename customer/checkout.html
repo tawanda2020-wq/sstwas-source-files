@@ -32,11 +32,11 @@
     <div class="space-y-3">
       <button data-method="ECOCASH" class="method-card w-full card p-4 flex items-center gap-3 text-left">
         <span class="text-2xl">📱</span>
-        <div><p class="font-semibold text-[#0D1B2A]">EcoCash</p><p class="text-xs text-[#4A5568]">Mobile money (simulated)</p></div>
+        <div><p class="font-semibold text-[#0D1B2A]">EcoCash</p><p class="text-xs text-[#4A5568]">Mobile money</p></div>
       </button>
       <button data-method="CARD" class="method-card w-full card p-4 flex items-center gap-3 text-left">
         <span class="text-2xl">💳</span>
-        <div><p class="font-semibold text-[#0D1B2A]">Bank Card</p><p class="text-xs text-[#4A5568]">Visa / Mastercard (simulated)</p></div>
+        <div><p class="font-semibold text-[#0D1B2A]">Bank Card</p><p class="text-xs text-[#4A5568]">Visa / Mastercard</p></div>
       </button>
       <button data-method="CASH" class="method-card w-full card p-4 flex items-center gap-3 text-left">
         <span class="text-2xl">💵</span>
@@ -64,11 +64,13 @@
     <div class="card p-5">
       <h2 class="font-semibold text-[#0D1B2A] mb-3">Bank Card Payment</h2>
       <label class="block text-xs font-semibold text-[#4A5568] mb-1">Card Number</label>
-      <input id="card-number" type="text" maxlength="19" placeholder="1234 5678 9012 3456" class="w-full border border-gray-200 rounded-lg p-3 mb-3 text-sm" />
+      <input id="card-number" type="text" maxlength="19" placeholder="1234 5678 9012 3456" class="w-full border border-gray-200 rounded-lg p-3 mb-1 text-sm" />
+<p class="text-[11px] text-[#4A5568] mb-3">Enter 16 digits with spaces e.g. <span class="font-mono font-semibold">4539 1488 0343 6467</span> (test number)</p>
       <div class="flex gap-3 mb-3">
         <div class="flex-1">
           <label class="block text-xs font-semibold text-[#4A5568] mb-1">Expiry (MM/YY)</label>
-          <input id="card-expiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+          <input id="card-expiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full border border-gray-200 rounded-lg p-3 text-sm"
+  oninput="this.value=this.value.replace(/[^0-9\/]/g,'').replace(/^(\d{2})(\d)/,'$1/$2')" />
         </div>
         <div class="w-20">
           <label class="block text-xs font-semibold text-[#4A5568] mb-1">CVV</label>
@@ -102,10 +104,26 @@
   <script type="module">
     import { getCartForTransaction, getTotal } from "../js/cart.js";
     import { submitOnlinePayment, submitCashPayment, isValidCardNumber } from "../js/payment.js";
-    import { subscribeToTransaction } from "../js/db.js";
+    import { subscribeToTransaction, getProduct } from "../js/db.js";
 
     const total = getTotal();
     const items = getCartForTransaction();
+
+    // Validate all cart items against live Firebase stock before any payment
+async function validateStockBeforePayment() {
+  const errors = [];
+  for (const item of items) {
+    const live = await getProduct(item.productId);
+    if (!live) {
+      errors.push(`"${item.name}" is no longer available.`);
+    } else if (live.stock === 0) {
+      errors.push(`"${item.name}" is out of stock.`);
+    } else if (item.qty > live.stock) {
+      errors.push(`Only ${live.stock} unit(s) of "${item.name}" left — you have ${item.qty} in your cart.\nPlease go back and reduce the quantity.`);
+    }
+  }
+  return errors;
+}
 
     // Render order summary
     document.getElementById("summary-table").innerHTML = items
@@ -127,14 +145,27 @@
       sections[name].classList.remove("hidden");
     }
 
-    document.querySelectorAll(".method-card").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const method = btn.dataset.method;
-        if (method === "ECOCASH") showSection("ecocash");
-        else if (method === "CARD") showSection("card");
-        else handleCash();
-      });
-    });
+   document.querySelectorAll(".method-card").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const method = btn.dataset.method;
+
+    // Live stock check before showing any payment form
+    overlay.classList.remove("hidden");
+    overlay.querySelector("p").textContent = "Checking stock availability…";
+    const stockErrors = await validateStockBeforePayment();
+    overlay.classList.add("hidden");
+    overlay.querySelector("p").textContent = "Processing payment…";
+
+    if (stockErrors.length > 0) {
+      alert("⚠️ Cannot proceed:\n\n" + stockErrors.join("\n\n") + "\n\nPlease go back and update your cart.");
+      return;
+    }
+
+    if (method === "ECOCASH") showSection("ecocash");
+    else if (method === "CARD") showSection("card");
+    else handleCash();
+  });
+});
 
     const overlay = document.getElementById("processing-overlay");
 
@@ -150,10 +181,18 @@
       // Fields cleared immediately - never persisted anywhere
       document.getElementById("ecocash-phone").value = "";
       document.getElementById("ecocash-pin").value = "";
+      
       overlay.classList.remove("hidden");
-      const { txnId } = await submitOnlinePayment("ECOCASH");
-      overlay.classList.add("hidden");
-      window.location.href = `receipt.html?txnId=${txnId}`;
+try {
+  const { txnId } = await submitOnlinePayment("ECOCASH");
+  overlay.classList.add("hidden");
+  window.location.href = `receipt.html?txnId=${txnId}`;
+} catch (err) {
+  overlay.classList.add("hidden");
+  document.getElementById("ecocash-error").textContent = "Payment failed: " + err.message;
+  document.getElementById("ecocash-error").classList.remove("hidden");
+}
+
     });
 
     document.getElementById("card-pay-btn").addEventListener("click", async () => {
@@ -184,9 +223,16 @@
       document.getElementById("card-name").value = "";
 
       overlay.classList.remove("hidden");
-      const { txnId } = await submitOnlinePayment("CARD");
-      overlay.classList.add("hidden");
-      window.location.href = `receipt.html?txnId=${txnId}`;
+try {
+  const { txnId } = await submitOnlinePayment("CARD");
+  overlay.classList.add("hidden");
+  window.location.href = `receipt.html?txnId=${txnId}`;
+} catch (err) {
+  overlay.classList.add("hidden");
+  document.getElementById("card-error").textContent = "Payment failed: " + err.message;
+  document.getElementById("card-error").classList.remove("hidden");
+}
+
     });
 
     async function handleCash() {

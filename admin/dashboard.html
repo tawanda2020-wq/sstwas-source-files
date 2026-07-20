@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin Dashboard — SSTWAS</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/admin.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — SSTWAS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
+
 <body class="min-h-screen bg-[#0D1B2A] flex">
 
   <!-- Sidebar -->
@@ -20,7 +22,13 @@
     <button data-panel="reports" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📈 Reports</button>
     <button data-panel="users" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">👤 Users</button>
     <button data-panel="settings" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">🛠 Settings</button>
-    <button id="logout-btn" class="mt-auto text-left py-2 px-3 rounded-lg text-gray-400 border border-gray-700">Logout</button>
+    <div id="stock-alert-banner"
+      class="hidden mt-3 bg-red-900/30 border border-red-500/30 rounded-lg p-3 text-xs text-red-300">
+      <p class="font-bold mb-1">⚠️ Stock Alerts</p>
+      <ul id="notif-list" class="space-y-1"></ul>
+    </div>
+    <button id="logout-btn"
+      class="mt-auto text-left py-2 px-3 rounded-lg text-gray-400 border border-gray-700">Logout</button>
   </nav>
 
   <main class="flex-1 p-4 md:p-6 overflow-y-auto">
@@ -32,16 +40,21 @@
     <!-- Products panel -->
     <section id="panel-products" class="panel space-y-4">
       <div class="flex justify-between items-center">
-        <input id="product-search" placeholder="Search products…" class="border border-gray-200 rounded-lg px-3 py-2 text-xs w-56" />
-        <button id="add-product-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">+ Add Product</button>
+        <input id="product-search" placeholder="Search products…"
+          class="border border-gray-200 rounded-lg px-3 py-2 text-xs w-56" />
+        <button id="add-product-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">+ Add
+          Product</button>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
             <tr class="text-left text-[#4A5568] border-b">
-              <th class="py-2 px-3">Name</th><th class="py-2 px-3">Category</th>
-              <th class="py-2 px-3 text-right">Price</th><th class="py-2 px-3 text-right">Stock</th>
-              <th class="py-2 px-3 text-center">Status</th><th class="py-2 px-3 text-center">Actions</th>
+              <th class="py-2 px-3">Name</th>
+              <th class="py-2 px-3">Category</th>
+              <th class="py-2 px-3 text-right">Price</th>
+              <th class="py-2 px-3 text-right">Stock</th>
+              <th class="py-2 px-3 text-center">Status</th>
+              <th class="py-2 px-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody id="products-tbody"></tbody>
@@ -56,7 +69,8 @@
         <select id="qr-product-select" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-4"></select>
         <div id="qr-output" class="flex justify-center mb-4"></div>
         <div class="flex gap-2">
-          <button id="qr-download-btn" class="flex-1 bg-[#1A73E8] text-white text-xs font-semibold py-2 rounded-lg">Download PNG</button>
+          <button id="qr-download-btn"
+            class="flex-1 bg-[#1A73E8] text-white text-xs font-semibold py-2 rounded-lg">Download PNG</button>
           <button id="qr-print-btn" class="flex-1 bg-gray-100 text-xs font-semibold py-2 rounded-lg">Print</button>
         </div>
       </div>
@@ -66,12 +80,19 @@
     <section id="panel-inventory" class="panel hidden space-y-4">
       <div class="card p-4 max-w-sm">
         <label class="block text-xs font-semibold text-[#4A5568] mb-1">Low Stock Alert Threshold</label>
-        <input id="low-stock-threshold" type="number" min="0" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-        <button id="save-threshold-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save</button>
+        <input id="low-stock-threshold" type="number" min="0"
+          class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <button id="save-threshold-btn"
+          class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save</button>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
-          <thead><tr class="text-left text-[#4A5568] border-b"><th class="py-2 px-3">Product</th><th class="py-2 px-3 text-right">Stock</th></tr></thead>
+          <thead>
+            <tr class="text-left text-[#4A5568] border-b">
+              <th class="py-2 px-3">Product</th>
+              <th class="py-2 px-3 text-right">Stock</th>
+            </tr>
+          </thead>
           <tbody id="inventory-tbody"></tbody>
         </table>
       </div>
@@ -79,13 +100,25 @@
 
     <!-- Reports panel -->
     <section id="panel-reports" class="panel hidden space-y-4">
-      <div class="flex justify-end">
+      <div class="flex items-center justify-between">
+        <p class="text-xs text-gray-400">All-time transaction data across all payment methods.</p>
         <button id="export-all-csv-btn" class="text-xs font-semibold text-[#1A73E8]">Export All to CSV</button>
       </div>
       <div class="grid md:grid-cols-2 gap-4">
-        <div class="card p-4"><h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Payment Method Breakdown</h3><canvas id="pie-chart"></canvas></div>
-        <div class="card p-4"><h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Revenue Over Time</h3><canvas id="bar-chart"></canvas></div>
+        <div class="card p-4">
+          <h3 class="text-xs font-semibold mb-0.5 text-[#4A5568]">Payment Method Breakdown</h3>
+          <p class="text-[11px] text-gray-400 mb-2">Share of total revenue by how customers paid (EcoCash, Card, Cash).
+          </p>
+          <canvas id="pie-chart"></canvas>
+        </div>
+        <div class="card p-4">
+          <h3 class="text-xs font-semibold mb-0.5 text-[#4A5568]">Revenue Over Time</h3>
+          <p class="text-[11px] text-gray-400 mb-2">Daily revenue totals — each bar is one calendar day of confirmed
+            sales.</p>
+          <canvas id="bar-chart"></canvas>
+        </div>
       </div>
+
       <div class="card p-4">
         <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Top Products Sold</h3>
         <ol id="top-products-list" class="text-xs list-decimal list-inside space-y-1"></ol>
@@ -96,24 +129,35 @@
     <section id="panel-users" class="panel hidden space-y-4">
       <div class="card p-4 max-w-md">
         <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Add Cashier / Admin Account</h3>
-        <input id="new-user-name" placeholder="Full name" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-        <input id="new-user-email" type="email" placeholder="Email" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <input id="new-user-name" placeholder="Full name"
+          class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+        <input id="new-user-email" type="email" placeholder="Email"
+          class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
         <div class="relative mb-2">
-  <input id="new-user-password" type="password" placeholder="Temporary password" class="w-full border border-gray-200 rounded-lg p-2 text-sm pr-10" />
-  <button type="button" id="toggle-new-password" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-    👁
-  </button>
-</div>
+          <input id="new-user-password" type="password" placeholder="Temporary password"
+            class="w-full border border-gray-200 rounded-lg p-2 text-sm pr-10" />
+          <button type="button" id="toggle-new-password"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+            👁
+          </button>
+        </div>
         <select id="new-user-role" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3">
           <option value="cashier">Cashier</option>
           <option value="admin">Admin</option>
         </select>
-        <button id="add-user-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Create Account</button>
-<p id="add-user-error" class="hidden text-xs text-[#D32F2F] mt-2 whitespace-pre-line leading-relaxed"></p>
+        <button id="add-user-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Create
+          Account</button>
+        <p id="add-user-error" class="hidden text-xs text-[#D32F2F] mt-2 whitespace-pre-line leading-relaxed"></p>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
-          <thead><tr class="text-left text-[#4A5568] border-b"><th class="py-2 px-3">Name</th><th class="py-2 px-3">Email</th><th class="py-2 px-3">Role</th></tr></thead>
+          <thead>
+            <tr class="text-left text-[#4A5568] border-b">
+              <th class="py-2 px-3">Name</th>
+              <th class="py-2 px-3">Email</th>
+              <th class="py-2 px-3">Role</th>
+            </tr>
+          </thead>
           <tbody id="users-tbody"></tbody>
         </table>
       </div>
@@ -122,31 +166,43 @@
     <!-- Settings panel -->
     <section id="panel-settings" class="panel hidden space-y-4">
       <div class="card p-4 max-w-md space-y-3">
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Store Name</label><input id="set-store-name" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Logo URL</label><input id="set-logo-url" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Currency Symbol</label><input id="set-currency" maxlength="3" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Receipt Footer Text</label><textarea id="set-footer" class="w-full border border-gray-200 rounded-lg p-2 text-sm"></textarea></div>
-        <button id="save-settings-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save Settings</button>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Store Name</label><input id="set-store-name"
+            class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Logo URL</label><input id="set-logo-url"
+            class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Currency Symbol</label><input
+            id="set-currency" maxlength="3" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
+        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Receipt Footer Text</label><textarea
+            id="set-footer" class="w-full border border-gray-200 rounded-lg p-2 text-sm"></textarea></div>
+        <button id="save-settings-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save
+          Settings</button>
       </div>
       <div class="card p-4 max-w-md border border-red-200">
         <h3 class="text-xs font-semibold text-[#D32F2F] mb-1">Danger Zone</h3>
-        <p class="text-xs text-[#4A5568] mb-3">This permanently deletes all transaction records from the database. Stock levels are not affected. This cannot be undone.</p>
+        <p class="text-xs text-[#4A5568] mb-3">This permanently deletes all transaction records from the database. Stock
+          levels are not affected. This cannot be undone.</p>
         <button id="clear-history-btn" class="bg-[#D32F2F] text-white text-xs font-semibold px-4 py-2 rounded-lg">
           Clear All Transaction History
-    </button>
-  </div>
+        </button>
+      </div>
     </section>
   </main>
 
   <!-- Add/Edit Product Modal -->
-  <div id="product-modal-backdrop" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50">
+  <div id="product-modal-backdrop"
+    class="hidden fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50">
     <div class="modal-panel w-full max-w-md p-6">
       <h2 id="product-modal-title" class="font-bold text-[#0D1B2A] mb-3">Add Product</h2>
-      <input id="pm-name" placeholder="Product name" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-      <input id="pm-category" placeholder="Category" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-      <input id="pm-price" type="number" step="0.01" placeholder="Price" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-      <input id="pm-stock" type="number" placeholder="Stock" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
-      <input id="pm-unit" placeholder="Unit (e.g. each, kg)" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-name" placeholder="Product name"
+        class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-category" placeholder="Category"
+        class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-price" type="number" step="0.01" placeholder="Price"
+        class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-stock" type="number" placeholder="Stock"
+        class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
+      <input id="pm-unit" placeholder="Unit (e.g. each, kg)"
+        class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
       <input id="pm-image" placeholder="Image URL" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3" />
       <div class="flex gap-3">
         <button id="pm-save-btn" class="flex-1 bg-[#1A73E8] text-white font-bold py-2.5 rounded-lg">Save</button>
@@ -155,7 +211,12 @@
     </div>
   </div>
 
-  <style>.nav-btn.active{background:#1A73E8;color:#fff;}</style>
+  <style>
+    .nav-btn.active {
+      background: #1A73E8;
+      color: #fff;
+    }
+  </style>
 
   <script type="module">
     import { requireRole, signOut } from "../js/auth.js";
@@ -191,17 +252,18 @@
         });
         renderQrSelect(products);
         renderInventoryTable(products);
+        checkLowStockAlerts(products);
       });
 
       document.getElementById("logout-btn").addEventListener("click", async () => {
         const confirmLogout = confirm("Are you sure you want to log out?");
-        
+
         if (confirmLogout) {
-        await signOut();
-        window.location.href = "login.html";
-    }
-    // If Cancel is clicked, nothing happens.
-});
+          await signOut();
+          window.location.href = "login.html";
+        }
+        // If Cancel is clicked, nothing happens.
+      });
 
       wireProductModal();
       wireQrPanel();
@@ -239,7 +301,7 @@
     function openAddModal() {
       editingId = null;
       document.getElementById("product-modal-title").textContent = "Add Product";
-      ["pm-name","pm-category","pm-price","pm-stock","pm-unit","pm-image"].forEach((id) => document.getElementById(id).value = "");
+      ["pm-name", "pm-category", "pm-price", "pm-stock", "pm-unit", "pm-image"].forEach((id) => document.getElementById(id).value = "");
       document.getElementById("product-modal-backdrop").classList.remove("hidden");
     }
     function openEditModal(id) {
@@ -259,35 +321,35 @@
       document.getElementById("product-modal-backdrop").classList.add("hidden");
     }
     async function saveProduct() {
-  const data = {
-    name: document.getElementById("pm-name").value.trim(),
-    category: document.getElementById("pm-category").value.trim(),
-    price: parseFloat(document.getElementById("pm-price").value) || 0,
-    stock: parseInt(document.getElementById("pm-stock").value) || 0,
-    unit: document.getElementById("pm-unit").value.trim() || "each",
-    imageUrl: document.getElementById("pm-image").value.trim()
-  };
-  if (!data.name) return alert("Product name is required.");
+      const data = {
+        name: document.getElementById("pm-name").value.trim(),
+        category: document.getElementById("pm-category").value.trim(),
+        price: parseFloat(document.getElementById("pm-price").value) || 0,
+        stock: parseInt(document.getElementById("pm-stock").value) || 0,
+        unit: document.getElementById("pm-unit").value.trim() || "each",
+        imageUrl: document.getElementById("pm-image").value.trim()
+      };
+      if (!data.name) return alert("Product name is required.");
 
-  const saveBtn = document.getElementById("pm-save-btn");
-  saveBtn.disabled = true;
-  saveBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
+      const saveBtn = document.getElementById("pm-save-btn");
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
 
-  try {
-    if (editingId) {
-      await editProduct(editingId, data);
-    } else {
-      const id = await addProduct(data);
-      await editProduct(id, { qrCode: id });
+      try {
+        if (editingId) {
+          await editProduct(editingId, data);
+        } else {
+          const id = await addProduct(data);
+          await editProduct(id, { qrCode: id });
+        }
+        closeProductModal();
+      } catch (err) {
+        alert("Failed to save product: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = "Save";
+      }
     }
-    closeProductModal();
-  } catch (err) {
-    alert("Failed to save product: " + err.message);
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.innerHTML = "Save";
-  }
-}
     async function handleDelete(id) {
       if (confirm("Delete this product permanently?")) await deleteProduct(id);
     }
@@ -314,6 +376,46 @@
       document.getElementById("qr-print-btn").addEventListener("click", () => window.print());
     }
 
+    async function checkLowStockAlerts(products) {
+      const settings = await getSettings();
+      const threshold = settings.lowStockThreshold || 10;
+      const notifList = document.getElementById("notif-list");
+
+      const lowStock = products.filter(p => p.stock <= threshold && p.stock > 0);
+      const outOfStock = products.filter(p => p.stock === 0);
+
+      // Clear previous stock alerts (keep other notifications)
+      notifList.querySelectorAll(".stock-alert").forEach(el => el.remove());
+
+      outOfStock.forEach(p => {
+        const li = document.createElement("li");
+        li.className = "stock-alert bg-red-50 border border-red-200 text-[#D32F2F] rounded-lg p-2 text-xs";
+        li.innerHTML = `<span class="font-bold">OUT OF STOCK:</span> ${p.name}`;
+        notifList.prepend(li);
+      });
+
+      lowStock.forEach(p => {
+        const li = document.createElement("li");
+        li.className = "stock-alert bg-amber-50 border border-amber-200 text-[#FF8F00] rounded-lg p-2 text-xs";
+        li.innerHTML = `<span class="font-bold">LOW STOCK:</span> ${p.name} - only ${p.stock} left (threshold: ${threshold})`;
+        notifList.prepend(li);
+      });
+
+      if (lowStock.length === 0 && outOfStock.length === 0) {
+        const li = document.createElement("li");
+        li.className = "stock-alert text-xs text-gray-400";
+        li.textContent = "✓ All products are adequately stocked.";
+        notifList.prepend(li);
+      }
+
+      const banner = document.getElementById("stock-alert-banner");
+      if (outOfStock.length > 0 || lowStock.length > 0) {
+        banner.classList.remove("hidden");
+      } else {
+        banner.classList.add("hidden");
+      }
+    }
+
     /* ---------- Inventory Panel ---------- */
     function renderInventoryTable(products) {
       const tbody = document.getElementById("inventory-tbody");
@@ -335,16 +437,16 @@
 
     /* ---------- Reports Panel ---------- */
     async function loadReports() {
-  // Destroy any existing Chart instances before re-rendering,
-  // otherwise Chart.js throws "Canvas is already in use".
-  ["pie-chart", "bar-chart"].forEach((id) => {
-    const existing = Chart.getChart(id);
-    if (existing) existing.destroy();
-  });
+      // Destroy any existing Chart instances before re-rendering,
+      // otherwise Chart.js throws "Canvas is already in use".
+      ["pie-chart", "bar-chart"].forEach((id) => {
+        const existing = Chart.getChart(id);
+        if (existing) existing.destroy();
+      });
 
-  const data = await loadAnalytics();
-  renderCharts(data, document.getElementById("pie-chart"), document.getElementById("bar-chart"));
-      
+      const data = await loadAnalytics();
+      renderCharts(data, document.getElementById("pie-chart"), document.getElementById("bar-chart"));
+
       document.getElementById("top-products-list").innerHTML = data.topProducts
         .map(([name, qty]) => `<li>${name} — ${qty} sold</li>`)
         .join("");
@@ -365,9 +467,9 @@
     }
     function wireUsersPanel() {
       document.getElementById("toggle-new-password").addEventListener("click", () => {
-    const input = document.getElementById("new-user-password");
-    input.type = input.type === "password" ? "text" : "password";
-  });
+        const input = document.getElementById("new-user-password");
+        input.type = input.type === "password" ? "text" : "password";
+      });
 
       document.getElementById("add-user-btn").addEventListener("click", async () => {
         const name = document.getElementById("new-user-name").value.trim();
@@ -378,52 +480,52 @@
           return alert("Fill all fields — password must be at least 6 characters.");
         }
         const errorEl = document.getElementById("add-user-error");
-const addBtn = document.getElementById("add-user-btn");
-errorEl.classList.add("hidden");
-errorEl.textContent = "";
+        const addBtn = document.getElementById("add-user-btn");
+        errorEl.classList.add("hidden");
+        errorEl.textContent = "";
 
-addBtn.disabled = true;
-addBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Creating…`;
+        addBtn.disabled = true;
+        addBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Creating…`;
 
-try {
-  await addCashierAccount(name, email, password, role);
-  document.getElementById("new-user-name").value = "";
-  document.getElementById("new-user-email").value = "";
-  document.getElementById("new-user-password").value = "";
-  errorEl.classList.add("hidden");
-  refreshUsers();
-} catch (err) {
-  errorEl.textContent = err.message;
-  errorEl.classList.remove("hidden");
-} finally {
-  addBtn.disabled = false;
-  addBtn.innerHTML = "Create Account";
-}
+        try {
+          await addCashierAccount(name, email, password, role);
+          document.getElementById("new-user-name").value = "";
+          document.getElementById("new-user-email").value = "";
+          document.getElementById("new-user-password").value = "";
+          errorEl.classList.add("hidden");
+          refreshUsers();
+        } catch (err) {
+          errorEl.textContent = err.message;
+          errorEl.classList.remove("hidden");
+        } finally {
+          addBtn.disabled = false;
+          addBtn.innerHTML = "Create Account";
+        }
       });
       refreshUsers();
     }
 
     /* ---------- Settings Panel ---------- */
     function wireSettingsPanel() {
-       document.getElementById("clear-history-btn").addEventListener("click", async () => {
-  if (!confirm("DELETE ALL transaction history? This cannot be undone.")) return;
-  if (!confirm("Are you absolutely sure? All sales records will be lost.")) return;
+      document.getElementById("clear-history-btn").addEventListener("click", async () => {
+        if (!confirm("DELETE ALL transaction history? This cannot be undone.")) return;
+        if (!confirm("Are you absolutely sure? All sales records will be lost.")) return;
 
-  const btn = document.getElementById("clear-history-btn");
-  btn.disabled = true;
-  btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Clearing…`;
+        const btn = document.getElementById("clear-history-btn");
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Clearing…`;
 
-  try {
-    await clearAllTransactions();
-    window.__allTxns = [];
-    btn.innerHTML = "✓ Cleared";
-    setTimeout(() => { btn.innerHTML = "Clear All Transaction History"; btn.disabled = false; }, 2000);
-  } catch (err) {
-    alert("Failed to clear history: " + err.message);
-    btn.disabled = false;
-    btn.innerHTML = "Clear All Transaction History";
-  }
-});
+        try {
+          await clearAllTransactions();
+          window.__allTxns = [];
+          btn.innerHTML = "✓ Cleared";
+          setTimeout(() => { btn.innerHTML = "Clear All Transaction History"; btn.disabled = false; }, 2000);
+        } catch (err) {
+          alert("Failed to clear history: " + err.message);
+          btn.disabled = false;
+          btn.innerHTML = "Clear All Transaction History";
+        }
+      });
       getSettings().then((s) => {
         document.getElementById("set-store-name").value = s.storeName || "";
         document.getElementById("set-logo-url").value = s.logoUrl || "";
@@ -431,26 +533,27 @@ try {
         document.getElementById("set-footer").value = s.receiptFooter || "";
       });
       document.getElementById("save-settings-btn").addEventListener("click", async () => {
-  const btn = document.getElementById("save-settings-btn");
-  btn.disabled = true;
-  btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
+        const btn = document.getElementById("save-settings-btn");
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Saving…`;
 
-  try {
-    await updateSettings({
-      storeName: document.getElementById("set-store-name").value.trim(),
-      logoUrl: document.getElementById("set-logo-url").value.trim(),
-      currencySymbol: document.getElementById("set-currency").value.trim() || "$",
-      receiptFooter: document.getElementById("set-footer").value.trim()
-    });
-    btn.innerHTML = "✓ Saved";
-    setTimeout(() => { btn.innerHTML = "Save Settings"; }, 2000);
-  } catch (err) {
-    alert("Failed to save: " + err.message);
-  } finally {
-    btn.disabled = false;
-  }
-});
+        try {
+          await updateSettings({
+            storeName: document.getElementById("set-store-name").value.trim(),
+            logoUrl: document.getElementById("set-logo-url").value.trim(),
+            currencySymbol: document.getElementById("set-currency").value.trim() || "$",
+            receiptFooter: document.getElementById("set-footer").value.trim()
+          });
+          btn.innerHTML = "✓ Saved";
+          setTimeout(() => { btn.innerHTML = "Save Settings"; }, 2000);
+        } catch (err) {
+          alert("Failed to save: " + err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
     }
   </script>
 </body>
+
 </html>

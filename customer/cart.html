@@ -55,23 +55,26 @@
       }
 
       listEl.innerHTML = items
-        .map(
-          (i) => `
-        <div class="card p-3 flex items-center justify-between" data-id="${i.productId}">
-          <div>
-            <p class="font-semibold text-[#0D1B2A] text-sm">${i.name}</p>
-            <p class="text-xs text-[#4A5568]">$${i.unitPrice.toFixed(2)} each</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button class="qty-minus w-7 h-7 rounded-full bg-gray-100 font-bold">−</button>
-            <span class="w-5 text-center text-sm font-semibold">${i.qty}</span>
-            <button class="qty-plus w-7 h-7 rounded-full bg-gray-100 font-bold">+</button>
-            <span class="font-bold text-sm text-[#1A73E8] w-14 text-right">$${(i.qty * i.unitPrice).toFixed(2)}</span>
-            <button class="remove-btn text-[#D32F2F] text-xs ml-1">✕</button>
-          </div>
-        </div>`
-        )
-        .join("");
+  .map(
+    (i) => `
+  <div class="card p-3" data-id="${i.productId}">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="font-semibold text-[#0D1B2A] text-sm">${i.name}</p>
+        <p class="text-xs text-[#4A5568]">$${i.unitPrice.toFixed(2)} each · ${i.stock != null ? i.stock + ' in stock' : ''}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="qty-minus w-7 h-7 rounded-full bg-gray-100 font-bold">−</button>
+        <span class="w-5 text-center text-sm font-semibold">${i.qty}</span>
+        <button class="qty-plus w-7 h-7 rounded-full bg-gray-100 font-bold ${i.qty >= (i.stock || 999) ? 'opacity-30 cursor-not-allowed' : ''}">+</button>
+        <span class="font-bold text-sm text-[#1A73E8] w-14 text-right">$${(i.qty * i.unitPrice).toFixed(2)}</span>
+        <button class="remove-btn text-[#D32F2F] text-xs ml-1">✕</button>
+      </div>
+    </div>
+    <p class="stock-warn hidden text-[10px] text-[#D32F2F] mt-1">Only ${i.stock} unit(s) available — cannot add more.</p>
+  </div>`
+  )
+  .join("");
 
       document.getElementById("cart-total").textContent = `$${getTotal().toFixed(2)}`;
 
@@ -83,9 +86,16 @@
           render();
         });
         row.querySelector(".qty-plus").addEventListener("click", () => {
-          updateQty(id, item.qty + 1);
-          render();
-        });
+  const maxStock = item.stock || 999;
+  if (item.qty >= maxStock) {
+    // Show inline warning instead of letting them go over
+    const warn = row.querySelector(".stock-warn");
+    if (warn) { warn.classList.remove("hidden"); setTimeout(() => warn.classList.add("hidden"), 2000); }
+    return;
+  }
+  updateQty(id, item.qty + 1);
+  render();
+});
         row.querySelector(".remove-btn").addEventListener("click", () => {
           removeItem(id);
           render();

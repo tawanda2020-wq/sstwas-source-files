@@ -60,10 +60,15 @@ export async function submitOnlinePayment(method) {
     confirmedAt: now
   });
 
+  try {
   await Promise.all(items.map((i) => decrementStock(i.productId, i.qty)));
-  clearCart();
-
-  return { txnId, paymentRef };
+} catch (err) {
+  // Payment is already recorded - don't block the customer from their receipt.
+  // Stock will reconcile on next admin inventory check.
+  console.error("Stock decrement failed (non-blocking):", err);
+}
+clearCart();
+return { txnId, paymentRef };
 }
 
 /**
