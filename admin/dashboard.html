@@ -109,6 +109,7 @@
           <option value="admin">Admin</option>
         </select>
         <button id="add-user-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Create Account</button>
+<p id="add-user-error" class="hidden text-xs text-[#D32F2F] mt-2 whitespace-pre-line leading-relaxed"></p>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
@@ -359,15 +360,21 @@
         if (!name || !email || password.length < 6) {
           return alert("Fill all fields — password must be at least 6 characters.");
         }
-        try {
-          await addCashierAccount(name, email, password, role);
-          document.getElementById("new-user-name").value = "";
-          document.getElementById("new-user-email").value = "";
-          document.getElementById("new-user-password").value = "";
-          refreshUsers();
-        } catch (err) {
-          alert("Could not create account: " + err.message);
-        }
+        const errorEl = document.getElementById("add-user-error");
+errorEl.classList.add("hidden");
+errorEl.textContent = "";
+
+try {
+  await addCashierAccount(name, email, password, role);
+  document.getElementById("new-user-name").value = "";
+  document.getElementById("new-user-email").value = "";
+  document.getElementById("new-user-password").value = "";
+  errorEl.classList.add("hidden");
+  refreshUsers();
+} catch (err) {
+  errorEl.textContent = err.message;
+  errorEl.classList.remove("hidden");
+}
       });
       refreshUsers();
     }

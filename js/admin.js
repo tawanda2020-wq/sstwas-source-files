@@ -208,20 +208,38 @@ export async function loadUsers() {
 
 /** Creates a Firebase Auth account + matching /users/<uid> record. */
 export async function addCashierAccount(name, email, password, role = "cashier") {
-  // Use a secondary Firebase app so creating a new user does NOT sign out
-  // the currently logged-in admin (Firebase signs you in as the newly
-  // created user if you use the primary auth instance).
   const secondaryAppName = "sstwas-user-creator";
   const secondaryApp = getApps().find(a => a.name === secondaryAppName)
     || initializeApp(firebaseConfig, secondaryAppName);
   const secondaryAuth = getAuth(secondaryApp);
 
-  const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-  await setUserRecord(cred.user.uid, { name, email, role });
+  try {
+    const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+    await setUserRecord(cred.user.uid, { name, email, role });
+    await secondaryAuth.signOut();
+    return cred.user.uid;
 
-  // Sign the secondary app out immediately - we only needed it to create
-  // the account. The primary admin session is completely untouched.
-  await secondaryAuth.signOut();
+  } catch (err) {
+    // Always sign the secondary app out so it never blocks future attempts
+    try { await secondaryAuth.signOut(); } catch (_) {}
 
-  return cred.user.uid;
+    if (err.code === "auth/email-already-in-use") {
+      // The Firebase Auth account already exists (likely from a previous
+      // failed attempt). The /users database record is probably missing.
+      // Throw a clear message telling the admin what to do.
+      throw new Error(
+        `The email "${email}" already has a Firebase Auth account - ` +
+        `it was likely created during a previous attempt but the database record was never saved. ` +
+        `\n\nTo fix this:\n` +
+        `1. Go to Firebase Console -> Authentication -> Users\n` +
+        `2. Find "${email}" and copy its UID\n` +
+        `3. Go to Realtime Database -> Data -> users -> add the UID node manually\n` +
+        `4. Add fields: name, email, role\n\n` +
+        `OR delete the account in Firebase Console and try creating it again here.`
+      );
+    }
+
+    // Re-throw any other errors unchanged
+    throw err;
+  }
 }
