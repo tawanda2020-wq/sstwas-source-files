@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cashier Dashboard - SSTWAS</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/cashier.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cashier Dashboard - SSTWAS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/cashier.css" />
 </head>
+
 <body class="min-h-screen bg-[#0D1B2A]">
 
   <div class="max-w-6xl mx-auto p-4 md:p-6">
@@ -19,27 +21,28 @@
       </div>
       <div class="flex items-center gap-4">
         <span id="live-clock" class="text-white text-sm font-mono"></span>
-        <button id="logout-btn" class="text-xs text-gray-300 border border-gray-600 rounded-lg px-3 py-1.5">Logout</button>
+        <button id="logout-btn"
+          class="text-xs text-gray-300 border border-gray-600 rounded-lg px-3 py-1.5">Logout</button>
       </div>
     </header>
 
     <!-- Stats strip -->
     <section class="grid grid-cols-3 gap-3 mb-6">
       <div class="card p-4 text-center">
-  <p class="text-xs text-[#4A5568]">Total Sales Today</p>
-  <p id="stat-sales" class="text-xl font-bold text-[#0D1B2A]">$0.00</p>
-  <p class="text-[10px] text-gray-400 mt-0.5">Sum of all PAID transactions</p>
-</div>
-<div class="card p-4 text-center">
-  <p class="text-xs text-[#4A5568]">Pending Payments</p>
-  <p id="stat-pending" class="text-xl font-bold text-[#FF8F00]">0</p>
-  <p class="text-[10px] text-gray-400 mt-0.5">Cash payments awaiting your confirmation</p>
-</div>
-<div class="card p-4 text-center">
-  <p class="text-xs text-[#4A5568]">Items Sold</p>
-  <p id="stat-items" class="text-xl font-bold text-[#0D1B2A]">0</p>
-  <p class="text-[10px] text-gray-400 mt-0.5">Total individual units across all sales</p>
-</div>
+        <p class="text-xs text-[#4A5568]">Total Sales Today</p>
+        <p id="stat-sales" class="text-xl font-bold text-[#0D1B2A]">$0.00</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Sum of all PAID transactions</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-xs text-[#4A5568]">Pending Payments</p>
+        <p id="stat-pending" class="text-xl font-bold text-[#FF8F00]">0</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Cash payments awaiting your confirmation</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-xs text-[#4A5568]">Items Sold</p>
+        <p id="stat-items" class="text-xl font-bold text-[#0D1B2A]">0</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Total individual units across all sales</p>
+      </div>
     </section>
 
     <div class="grid md:grid-cols-3 gap-6">
@@ -49,7 +52,8 @@
         <section class="card p-4">
           <div class="flex items-center justify-between mb-3">
             <h2 class="font-semibold text-[#0D1B2A]">Pending Payments Queue</h2>
-            <input id="search-ref" placeholder="Search by Payment Ref…" class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs w-48" />
+            <input id="search-ref" placeholder="Search by Payment Ref…"
+              class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs w-48" />
           </div>
           <table class="w-full text-xs">
             <thead>
@@ -105,13 +109,209 @@
         <span>Total</span><span id="modal-total"></span>
       </div>
       <div class="flex gap-3">
-        <button id="modal-confirm-btn" class="flex-1 bg-[#00C853] text-white font-bold py-2.5 rounded-lg">Confirm & Mark as Paid</button>
-        <button id="modal-cancel-btn" class="flex-1 bg-[#D32F2F] text-white font-bold py-2.5 rounded-lg">Cancel Transaction</button>
+        <button id="modal-confirm-btn" class="flex-1 bg-[#00C853] text-white font-bold py-2.5 rounded-lg">Confirm & Mark
+          as Paid</button>
+        <button id="modal-cancel-btn" class="flex-1 bg-[#D32F2F] text-white font-bold py-2.5 rounded-lg">Cancel
+          Transaction</button>
       </div>
       <button id="modal-close-btn" class="block mx-auto mt-3 text-xs text-gray-400">Close</button>
     </div>
   </div>
 
+  <script type="module">
+    import { requireRole, signOut, getUserRole } from "../js/auth.js";
+    import { auth } from "../js/firebase-config.js";
+    import {
+      onLoad,
+      renderPendingTable,
+      getCachedTransaction,
+      confirmPayment,
+      cancelTransaction,
+      searchByRef
+    } from "../js/cashier.js";
+    import { exportTransactionsToCSV } from "../js/admin.js";
+    import { subscribeAllTransactions } from "../js/db.js";
+
+    let allPending = [];
+
+    requireRole(["cashier", "admin"], "login.html").then(async ({ uid }) => {
+      const role = await getUserRole(uid);
+      document.getElementById("cashier-name").textContent =
+        `${auth.currentUser.email} · ${role}`;
+      init();
+    });
+
+    function init() {
+      // ── Live pending queue ──────────────────────────────────────────────
+      onLoad((txns) => {
+        allPending = txns;
+        renderPendingTable(
+          txns,
+          document.getElementById("pending-tbody"),
+          openModal
+        );
+        document.getElementById("stat-pending").textContent = txns.length;
+        wireConfirmButtons();
+        pushNotification(
+          `Pending queue updated — ${txns.length} awaiting payment`,
+          "amber"
+        );
+      });
+
+      // ── Live sales history + stats ──────────────────────────────────────
+      // onValue fires immediately on connect AND every time any transaction
+      // changes — no manual refresh needed.
+      subscribeAllTransactions((allTxns) => {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const todaysPaid = allTxns
+          .filter(
+            (t) =>
+              t.status === "PAID" &&
+              (t.confirmedAt || t.createdAt) >= startOfDay.getTime()
+          )
+          .sort(
+            (a, b) =>
+              (b.confirmedAt || b.createdAt) - (a.confirmedAt || a.createdAt)
+          );
+
+        // Stats strip
+        const totalSales = todaysPaid.reduce((s, t) => s + t.total, 0);
+        const itemsSold = todaysPaid.reduce(
+          (s, t) => s + (t.items || []).reduce((a, i) => a + i.qty, 0),
+          0
+        );
+        document.getElementById("stat-sales").textContent =
+          `$${totalSales.toFixed(2)}`;
+        document.getElementById("stat-items").textContent = itemsSold;
+
+        // History table
+        const tbody = document.getElementById("history-tbody");
+        if (todaysPaid.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-xs">No completed sales yet today.</td></tr>`;
+        } else {
+          tbody.innerHTML = todaysPaid
+            .map(
+              (t) => `
+            <tr class="border-b">
+              <td class="py-1.5 px-3">${t.paymentRef}</td>
+              <td class="py-1.5 px-3">${t.paymentMethod}</td>
+              <td class="py-1.5 px-3 text-right font-semibold">$${t.total.toFixed(2)}</td>
+              <td class="py-1.5 px-3 text-center">${new Date(
+                t.confirmedAt || t.createdAt
+              ).toLocaleTimeString()}</td>
+            </tr>`
+            )
+            .join("");
+        }
+
+        window.__lastSales = todaysPaid;
+      });
+
+      tickClock();
+      setInterval(tickClock, 1000);
+    }
+
+    function wireConfirmButtons() {
+      document.querySelectorAll(".confirm-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openModal(btn.dataset.txnId);
+        });
+      });
+    }
+
+    function openModal(txnId) {
+      const txn = getCachedTransaction(txnId);
+      if (!txn) return;
+      document.getElementById("modal-ref").textContent = txn.paymentRef;
+      document.getElementById("modal-items").innerHTML = (txn.items || [])
+        .map(
+          (i) =>
+            `<tr><td class="py-1">${i.name} x${i.qty}</td><td class="py-1 text-right">$${i.subtotal.toFixed(2)}</td></tr>`
+        )
+        .join("");
+      document.getElementById("modal-total").textContent =
+        `$${txn.total.toFixed(2)}`;
+      document.getElementById("modal-backdrop").classList.remove("hidden");
+
+      document.getElementById("modal-confirm-btn").onclick = async () => {
+        const confirmBtn = document.getElementById("modal-confirm-btn");
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `<svg class="inline w-4 h-4 mr-1 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Confirming…`;
+        try {
+          await confirmPayment(txnId, txn.items);
+          pushNotification(`Payment confirmed — ${txn.paymentRef}`, "green");
+          closeModal();
+          // No refreshHistory() call needed — subscribeAllTransactions updates automatically
+        } catch (err) {
+          alert("Failed to confirm payment: " + err.message);
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = "Confirm & Mark as Paid";
+        }
+      };
+
+      document.getElementById("modal-cancel-btn").onclick = async () => {
+        await cancelTransaction(txnId);
+        closeModal();
+      };
+    }
+
+    function closeModal() {
+      document.getElementById("modal-backdrop").classList.add("hidden");
+    }
+
+    document
+      .getElementById("modal-close-btn")
+      .addEventListener("click", closeModal);
+
+    document
+      .getElementById("search-ref")
+      .addEventListener("keydown", async (e) => {
+        if (e.key !== "Enter") return;
+        const txn = await searchByRef(e.target.value);
+        if (txn) openModal(txn.id);
+        else alert("No transaction found with that reference.");
+      });
+
+    document
+      .getElementById("export-csv-btn")
+      .addEventListener("click", () => {
+        exportTransactionsToCSV(window.__lastSales || [], "sales-history.csv");
+      });
+
+    function pushNotification(text, color) {
+      const colors = {
+        amber: "bg-amber-50 text-[#FF8F00]",
+        green: "bg-green-50 text-[#00C853]",
+        red: "bg-red-50 text-[#D32F2F]",
+      };
+      const list = document.getElementById("notif-list");
+      const li = document.createElement("li");
+      li.className = `${colors[color]} rounded-lg p-2 text-xs`;
+      li.textContent = `${new Date().toLocaleTimeString()} — ${text}`;
+      list.prepend(li);
+      while (list.children.length > 8) list.removeChild(list.lastChild);
+    }
+
+    function tickClock() {
+      document.getElementById("live-clock").textContent =
+        new Date().toLocaleTimeString();
+    }
+
+    document
+      .getElementById("logout-btn")
+      .addEventListener("click", async () => {
+        if (!confirm("Are you sure you want to logout?")) return;
+        await signOut();
+        window.location.href = "login.html";
+      });
+  </script>
+
+  <!---
+  OLD SCRIPT FILE WITH SALES HISTORY EXPORT FUNCTIONALITY not fetching properly
+   
   <script type="module">
     import { requireRole, signOut, getUserRole } from "../js/auth.js";
     import { auth } from "../js/firebase-config.js";
@@ -249,5 +449,7 @@
   window.location.href = "login.html";
 });
   </script>
+  -->
 </body>
+
 </html>

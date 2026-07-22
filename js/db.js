@@ -116,6 +116,14 @@ export async function getAllTransactions() {
   return Object.keys(val).map((id) => ({ id, ...val[id] }));
 }
 
+export function subscribeAllTransactions(callback) {
+  return onValue(ref(db, "transactions"), (snap) => {
+    const val = snap.val() || {};
+    const list = Object.keys(val).map((id) => ({ id, ...val[id] }));
+    callback(list);
+  });
+}
+
 /** Finds a transaction by its human-readable payment reference (cashier search). */
 export async function findTransactionByRef(paymentRef) {
   const q = query(ref(db, "transactions"), orderByChild("paymentRef"), equalTo(paymentRef));
