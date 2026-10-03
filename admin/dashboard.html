@@ -4,51 +4,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — SSTWAS</title>
+  <title>Admin Dashboard — Self Service Till</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 
-<body class="min-h-screen bg-[#0D1B2A] flex">
+<body class="min-h-screen admin-shell flex">
+
+  <!-- Mobile top bar -->
+  <div class="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 sidebar text-white">
+    <button id="sidebar-open-btn" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/10"><i data-lucide="menu" class="w-5 h-5"></i></button>
+    <span class="font-display italic text-sm">Admin</span>
+    <span class="w-9 h-9"></span>
+  </div>
+
+  <!-- Sidebar backdrop (mobile) -->
+  <div id="sidebar-backdrop" class="hidden md:hidden fixed inset-0 bg-black/40 z-40"></div>
 
   <!-- Sidebar -->
-  <nav class="w-56 bg-[#0D1B2A] border-r border-gray-700 p-4 hidden md:flex flex-col text-gray-300 text-sm">
-    <h1 class="text-white font-bold mb-6">⚙️ Admin</h1>
-    <button data-panel="products" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📦 Products</button>
-    <button data-panel="qr" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">🔳 QR Generator</button>
-    <button data-panel="inventory" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📊 Inventory</button>
-    <button data-panel="reports" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">📈 Reports</button>
-    <button data-panel="users" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">👤 Users</button>
-    <button data-panel="settings" class="nav-btn text-left py-2 px-3 rounded-lg mb-1">🛠 Settings</button>
+  <nav id="sidebar"
+    class="sidebar w-64 p-4 flex flex-col text-gray-300 text-sm fixed md:static top-0 left-0 h-full z-50 -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-white font-display italic text-lg flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4"></i> Admin</h1>
+      <button id="sidebar-close-btn" class="md:hidden text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+    <div class="space-y-1 overflow-y-auto flex-1">
+      <button data-panel="products" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="package" class="w-4 h-4"></i> Products</button>
+      <button data-panel="sessions" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="activity" class="w-4 h-4"></i> Shopper Sessions</button>
+      <button data-panel="qr" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="qr-code" class="w-4 h-4"></i> QR Generator</button>
+      <button data-panel="inventory" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="boxes" class="w-4 h-4"></i> Inventory</button>
+      <button data-panel="flags" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="flag" class="w-4 h-4"></i> Flagged Scans</button>
+      <button data-panel="reports" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports</button>
+      <button data-panel="users" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i> Users</button>
+      <button data-panel="settings" class="nav-btn w-full text-left py-2.5 px-3 rounded-lg"><i data-lucide="settings" class="w-4 h-4"></i> Settings</button>
+    </div>
     <div id="stock-alert-banner"
       class="hidden mt-3 bg-red-900/30 border border-red-500/30 rounded-lg p-3 text-xs text-red-300">
-      <p class="font-bold mb-1">⚠️ Stock Alerts</p>
+      <p class="font-bold mb-1 flex items-center gap-1"><i data-lucide="triangle-alert" class="w-3.5 h-3.5"></i>Stock Alerts</p>
       <ul id="notif-list" class="space-y-1"></ul>
     </div>
     <button id="logout-btn"
-      class="mt-auto text-left py-2 px-3 rounded-lg text-gray-400 border border-gray-700">Logout</button>
+      class="mt-3 text-left py-2.5 px-3 rounded-lg text-gray-400 border border-white/10 flex items-center gap-2 hover:bg-white/5 transition">
+      <i data-lucide="log-out" class="w-4 h-4"></i> Logout</button>
   </nav>
 
-  <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+  <main class="flex-1 p-4 md:p-6 overflow-y-auto pt-20 md:pt-6">
     <header class="flex justify-between items-center mb-6">
-      <h2 id="panel-title" class="text-white font-bold text-lg">Products</h2>
+      <h2 id="panel-title" class="font-display italic text-[#0D1B2A] text-2xl">Products</h2>
       <span id="admin-email" class="text-gray-400 text-xs"></span>
     </header>
 
     <!-- Products panel -->
     <section id="panel-products" class="panel space-y-4">
-      <div class="flex justify-between items-center">
-        <input id="product-search" placeholder="Search products…"
-          class="border border-gray-200 rounded-lg px-3 py-2 text-xs w-56" />
-        <button id="add-product-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">+ Add
-          Product</button>
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="product-search" placeholder="Search products…"
+            class="border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-xs w-56 focus:border-[#1A73E8] outline-none transition" />
+        </div>
+        <button id="add-product-btn" class="btn-grad text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Product</button>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
-            <tr class="text-left text-[#4A5568] border-b">
+            <tr class="text-left text-gray-400 border-b">
               <th class="py-2 px-3">Name</th>
               <th class="py-2 px-3">Category</th>
               <th class="py-2 px-3 text-right">Price</th>
@@ -62,16 +88,69 @@
       </div>
     </section>
 
+    <!-- Shopper Sessions panel -->
+    <section id="panel-sessions" class="panel hidden space-y-4">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <p class="text-xs text-gray-400 flex items-center gap-1.5">
+          <span class="pulse-dot"></span> Live baskets on the floor — updates in real time.
+        </p>
+        <button id="export-sessions-csv-btn" class="text-xs font-semibold text-[#1A73E8] flex items-center gap-1"><i data-lucide="download" class="w-3.5 h-3.5"></i>Export CSV</button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
+        <div class="stat-card p-4">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">Active Baskets</p>
+          <p id="sess-stat-active" class="text-2xl font-bold text-[#0D1B2A]">0</p>
+        </div>
+        <div class="stat-card p-4" style="--accent:var(--grad-error)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">Flagged Sessions</p>
+          <p id="sess-stat-flagged" class="text-2xl font-bold text-[#D32F2F]">0</p>
+        </div>
+        <div class="stat-card p-4" style="--accent:var(--grad-warning)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">At Checkout</p>
+          <p id="sess-stat-checkout" class="text-2xl font-bold text-[#FF8F00]">0</p>
+        </div>
+        <div class="stat-card p-4" style="--accent:var(--grad-success)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">Avg Basket Value</p>
+          <p id="sess-stat-avg" class="text-2xl font-bold text-[#0D1B2A]">$0.00</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2 flex-wrap" id="sessions-filter-tabs">
+        <button data-filter="all" class="sess-tab chip text-xs px-4 py-2 bg-[#0D1B2A] text-white">All</button>
+        <button data-filter="active" class="sess-tab chip text-xs px-4 py-2 bg-white border border-gray-200">Active</button>
+        <button data-filter="checkout" class="sess-tab chip text-xs px-4 py-2 bg-white border border-gray-200">Checkout</button>
+        <button data-filter="flagged" class="sess-tab chip text-xs px-4 py-2 bg-white border border-gray-200">Flagged</button>
+        <button data-filter="paid" class="sess-tab chip text-xs px-4 py-2 bg-white border border-gray-200">Paid</button>
+      </div>
+
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-left text-gray-400 border-b">
+              <th class="py-2 px-3">Basket</th>
+              <th class="py-2 px-3">Shopper</th>
+              <th class="py-2 px-3">Items</th>
+              <th class="py-2 px-3 text-right">Total</th>
+              <th class="py-2 px-3 text-center">Started</th>
+              <th class="py-2 px-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- QR panel -->
     <section id="panel-qr" class="panel hidden space-y-4">
       <div class="card p-4 max-w-md">
-        <label class="block text-xs font-semibold text-[#4A5568] mb-1">Select Product</label>
+        <label class="block text-xs font-semibold text-gray-400 mb-1">Select Product</label>
         <select id="qr-product-select" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-4"></select>
         <div id="qr-output" class="flex justify-center mb-4"></div>
         <div class="flex gap-2">
           <button id="qr-download-btn"
-            class="flex-1 bg-[#1A73E8] text-white text-xs font-semibold py-2 rounded-lg">Download PNG</button>
-          <button id="qr-print-btn" class="flex-1 bg-gray-100 text-xs font-semibold py-2 rounded-lg">Print</button>
+            class="flex-1 btn-grad text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i>Download PNG</button>
+          <button id="qr-print-btn" class="flex-1 bg-gray-100 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5"><i data-lucide="printer" class="w-3.5 h-3.5"></i>Print</button>
         </div>
       </div>
     </section>
@@ -79,16 +158,16 @@
     <!-- Inventory panel -->
     <section id="panel-inventory" class="panel hidden space-y-4">
       <div class="card p-4 max-w-sm">
-        <label class="block text-xs font-semibold text-[#4A5568] mb-1">Low Stock Alert Threshold</label>
+        <label class="block text-xs font-semibold text-gray-400 mb-1">Low Stock Alert Threshold</label>
         <input id="low-stock-threshold" type="number" min="0"
           class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
         <button id="save-threshold-btn"
-          class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save</button>
+          class="btn-grad text-xs font-semibold px-4 py-2 rounded-lg">Save</button>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
-            <tr class="text-left text-[#4A5568] border-b">
+            <tr class="text-left text-gray-400 border-b">
               <th class="py-2 px-3">Product</th>
               <th class="py-2 px-3 text-right">Stock</th>
             </tr>
@@ -98,21 +177,43 @@
       </div>
     </section>
 
+    <!-- Flagged Scans panel -->
+    <section id="panel-flags" class="panel hidden space-y-4">
+      <p class="text-xs text-gray-400">Loss prevention — scans and basket activity that need a human look.</p>
+
+      <div class="grid grid-cols-3 gap-3 stagger">
+        <div class="stat-card p-4" style="--accent:var(--grad-error)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">Open Flags</p>
+          <p id="flag-stat-open" class="text-2xl font-bold text-[#D32F2F]">0</p>
+        </div>
+        <div class="stat-card p-4" style="--accent:var(--grad-warning)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">High Severity</p>
+          <p id="flag-stat-high" class="text-2xl font-bold text-[#FF8F00]">0</p>
+        </div>
+        <div class="stat-card p-4" style="--accent:var(--grad-success)">
+          <p class="text-[10px] tracking-wide uppercase text-gray-400 mb-1">Resolved Today</p>
+          <p id="flag-stat-resolved" class="text-2xl font-bold text-[#00C853]">0</p>
+        </div>
+      </div>
+
+      <div id="flags-list" class="space-y-3"></div>
+    </section>
+
     <!-- Reports panel -->
     <section id="panel-reports" class="panel hidden space-y-4">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between flex-wrap gap-2">
         <p class="text-xs text-gray-400">All-time transaction data across all payment methods.</p>
-        <button id="export-all-csv-btn" class="text-xs font-semibold text-[#1A73E8]">Export All to CSV</button>
+        <button id="export-all-csv-btn" class="text-xs font-semibold text-[#1A73E8] flex items-center gap-1"><i data-lucide="download" class="w-3.5 h-3.5"></i>Export All to CSV</button>
       </div>
       <div class="grid md:grid-cols-2 gap-4">
         <div class="card p-4">
-          <h3 class="text-xs font-semibold mb-0.5 text-[#4A5568]">Payment Method Breakdown</h3>
+          <h3 class="text-xs font-semibold mb-0.5 text-[#0D1B2A]">Payment Method Breakdown</h3>
           <p class="text-[11px] text-gray-400 mb-2">Share of total revenue by how customers paid (EcoCash, Card, Cash).
           </p>
           <canvas id="pie-chart"></canvas>
         </div>
         <div class="card p-4">
-          <h3 class="text-xs font-semibold mb-0.5 text-[#4A5568]">Revenue Over Time</h3>
+          <h3 class="text-xs font-semibold mb-0.5 text-[#0D1B2A]">Revenue Over Time</h3>
           <p class="text-[11px] text-gray-400 mb-2">Daily revenue totals — each bar is one calendar day of confirmed
             sales.</p>
           <canvas id="bar-chart"></canvas>
@@ -120,7 +221,7 @@
       </div>
 
       <div class="card p-4">
-        <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Top Products Sold</h3>
+        <h3 class="text-xs font-semibold mb-2 text-[#0D1B2A]">Top Products Sold</h3>
         <ol id="top-products-list" class="text-xs list-decimal list-inside space-y-1"></ol>
       </div>
     </section>
@@ -128,7 +229,7 @@
     <!-- Users panel -->
     <section id="panel-users" class="panel hidden space-y-4">
       <div class="card p-4 max-w-md">
-        <h3 class="text-xs font-semibold mb-2 text-[#4A5568]">Add Cashier / Admin Account</h3>
+        <h3 class="text-xs font-semibold mb-2 text-[#0D1B2A]">Add Cashier / Admin Account</h3>
         <input id="new-user-name" placeholder="Full name"
           class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
         <input id="new-user-email" type="email" placeholder="Email"
@@ -137,22 +238,22 @@
           <input id="new-user-password" type="password" placeholder="Temporary password"
             class="w-full border border-gray-200 rounded-lg p-2 text-sm pr-10" />
           <button type="button" id="toggle-new-password"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-            👁
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
           </button>
         </div>
         <select id="new-user-role" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3">
           <option value="cashier">Cashier</option>
           <option value="admin">Admin</option>
         </select>
-        <button id="add-user-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Create
+        <button id="add-user-btn" class="btn-grad text-xs font-semibold px-4 py-2 rounded-lg">Create
           Account</button>
         <p id="add-user-error" class="hidden text-xs text-[#D32F2F] mt-2 whitespace-pre-line leading-relaxed"></p>
       </div>
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
-            <tr class="text-left text-[#4A5568] border-b">
+            <tr class="text-left text-gray-400 border-b">
               <th class="py-2 px-3">Name</th>
               <th class="py-2 px-3">Email</th>
               <th class="py-2 px-3">Role</th>
@@ -166,20 +267,20 @@
     <!-- Settings panel -->
     <section id="panel-settings" class="panel hidden space-y-4">
       <div class="card p-4 max-w-md space-y-3">
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Store Name</label><input id="set-store-name"
+        <div><label class="block text-xs font-semibold text-gray-400 mb-1">Store Name</label><input id="set-store-name"
             class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Logo URL</label><input id="set-logo-url"
+        <div><label class="block text-xs font-semibold text-gray-400 mb-1">Logo URL</label><input id="set-logo-url"
             class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Currency Symbol</label><input
+        <div><label class="block text-xs font-semibold text-gray-400 mb-1">Currency Symbol</label><input
             id="set-currency" maxlength="3" class="w-full border border-gray-200 rounded-lg p-2 text-sm" /></div>
-        <div><label class="block text-xs font-semibold text-[#4A5568] mb-1">Receipt Footer Text</label><textarea
+        <div><label class="block text-xs font-semibold text-gray-400 mb-1">Receipt Footer Text</label><textarea
             id="set-footer" class="w-full border border-gray-200 rounded-lg p-2 text-sm"></textarea></div>
-        <button id="save-settings-btn" class="bg-[#1A73E8] text-white text-xs font-semibold px-4 py-2 rounded-lg">Save
+        <button id="save-settings-btn" class="btn-grad text-xs font-semibold px-4 py-2 rounded-lg">Save
           Settings</button>
       </div>
       <div class="card p-4 max-w-md border border-red-200">
-        <h3 class="text-xs font-semibold text-[#D32F2F] mb-1">Danger Zone</h3>
-        <p class="text-xs text-[#4A5568] mb-3">This permanently deletes all transaction records from the database. Stock
+        <h3 class="text-xs font-semibold text-[#D32F2F] mb-1 flex items-center gap-1.5"><i data-lucide="triangle-alert" class="w-3.5 h-3.5"></i>Danger Zone</h3>
+        <p class="text-xs text-gray-400 mb-3">This permanently deletes all transaction records from the database. Stock
           levels are not affected. This cannot be undone.</p>
         <button id="clear-history-btn" class="bg-[#D32F2F] text-white text-xs font-semibold px-4 py-2 rounded-lg">
           Clear All Transaction History
@@ -205,18 +306,11 @@
         class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2" />
       <input id="pm-image" placeholder="Image URL" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3" />
       <div class="flex gap-3">
-        <button id="pm-save-btn" class="flex-1 bg-[#1A73E8] text-white font-bold py-2.5 rounded-lg">Save</button>
+        <button id="pm-save-btn" class="flex-1 btn-grad font-bold py-2.5 rounded-lg">Save</button>
         <button id="pm-cancel-btn" class="flex-1 bg-gray-100 font-bold py-2.5 rounded-lg">Cancel</button>
       </div>
     </div>
   </div>
-
-  <style>
-    .nav-btn.active {
-      background: #1A73E8;
-      color: #fff;
-    }
-  </style>
 
   <script type="module">
     import { requireRole, signOut } from "../js/auth.js";
@@ -225,10 +319,17 @@
     import {
       loadProducts, addProduct, editProduct, deleteProduct, toggleActive,
       renderProductTable, generateQR, downloadQR, loadAnalytics, renderCharts,
-      exportTransactionsToCSV, loadUsers, addCashierAccount
+      exportTransactionsToCSV, loadUsers, addCashierAccount,
+      loadSessions, computeSessionStats, renderSessionsTable, exportSessionsToCSV,
+      loadFlags, computeFlagStats, renderFlagsList, reviewFlag, dismissFlag
     } from "../js/admin.js";
 
+    lucide.createIcons();
+
     let productsCache = [];
+    let sessionsCache = [];
+    let flagsCache = [];
+    let sessionFilter = "all";
 
     requireRole(["admin"], "login.html").then(() => {
       document.getElementById("admin-email").textContent = auth.currentUser.email;
@@ -236,11 +337,11 @@
     });
 
     function init() {
-      // Sidebar nav
       document.querySelectorAll(".nav-btn").forEach((btn) => {
-        btn.addEventListener("click", () => switchPanel(btn.dataset.panel));
+        btn.addEventListener("click", () => { switchPanel(btn.dataset.panel); closeSidebar(); });
       });
       switchPanel("products");
+      wireMobileSidebar();
 
       loadProducts((products) => {
         productsCache = products;
@@ -255,14 +356,22 @@
         checkLowStockAlerts(products);
       });
 
+      loadSessions((sessions) => {
+        sessionsCache = sessions;
+        renderSessionsPanel();
+      });
+
+      loadFlags((flags) => {
+        flagsCache = flags;
+        renderFlagsPanel();
+      });
+
       document.getElementById("logout-btn").addEventListener("click", async () => {
         const confirmLogout = confirm("Are you sure you want to log out?");
-
         if (confirmLogout) {
           await signOut();
           window.location.href = "login.html";
         }
-        // If Cancel is clicked, nothing happens.
       });
 
       wireProductModal();
@@ -270,6 +379,7 @@
       wireReportsPanel();
       wireUsersPanel();
       wireSettingsPanel();
+      wireSessionsPanel();
 
       document.getElementById("product-search").addEventListener("input", (e) => {
         const term = e.target.value.toLowerCase();
@@ -282,12 +392,28 @@
       });
     }
 
+    /* ---------- Mobile sidebar ---------- */
+    function wireMobileSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebar-backdrop");
+      document.getElementById("sidebar-open-btn").addEventListener("click", () => {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      });
+      document.getElementById("sidebar-close-btn").addEventListener("click", closeSidebar);
+      backdrop.addEventListener("click", closeSidebar);
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.add("-translate-x-full");
+      document.getElementById("sidebar-backdrop").classList.add("hidden");
+    }
+
     function switchPanel(name) {
       document.querySelectorAll(".panel").forEach((p) => p.classList.add("hidden"));
       document.getElementById(`panel-${name}`).classList.remove("hidden");
       document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.panel === name));
       document.getElementById("panel-title").textContent =
-        { products: "Products", qr: "QR Generator", inventory: "Inventory", reports: "Reports", users: "Users", settings: "Settings" }[name];
+        { products: "Products", sessions: "Shopper Sessions", qr: "QR Generator", inventory: "Inventory", flags: "Flagged Scans", reports: "Reports", users: "Users", settings: "Settings" }[name];
       if (name === "reports") loadReports();
     }
 
@@ -384,7 +510,6 @@
       const lowStock = products.filter(p => p.stock <= threshold && p.stock > 0);
       const outOfStock = products.filter(p => p.stock === 0);
 
-      // Clear previous stock alerts (keep other notifications)
       notifList.querySelectorAll(".stock-alert").forEach(el => el.remove());
 
       outOfStock.forEach(p => {
@@ -435,10 +560,48 @@
       if (s.lowStockThreshold != null) document.getElementById("low-stock-threshold").value = s.lowStockThreshold;
     });
 
+    /* ---------- Shopper Sessions Panel ---------- */
+    function renderSessionsPanel() {
+      const stats = computeSessionStats(sessionsCache);
+      document.getElementById("sess-stat-active").textContent = stats.active;
+      document.getElementById("sess-stat-flagged").textContent = stats.flagged;
+      document.getElementById("sess-stat-checkout").textContent = stats.checkout;
+      document.getElementById("sess-stat-avg").textContent = `$${stats.avgBasket.toFixed(2)}`;
+      renderSessionsTable(sessionsCache, document.getElementById("sessions-tbody"), sessionFilter);
+    }
+    function wireSessionsPanel() {
+      document.querySelectorAll(".sess-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          sessionFilter = btn.dataset.filter;
+          document.querySelectorAll(".sess-tab").forEach((b) => {
+            b.classList.toggle("bg-[#0D1B2A]", b === btn);
+            b.classList.toggle("text-white", b === btn);
+            b.classList.toggle("bg-white", b !== btn);
+            b.classList.toggle("border", b !== btn);
+            b.classList.toggle("border-gray-200", b !== btn);
+          });
+          renderSessionsPanel();
+        });
+      });
+      document.getElementById("export-sessions-csv-btn").addEventListener("click", () => {
+        exportSessionsToCSV(sessionsCache, "shopper-sessions.csv");
+      });
+    }
+
+    /* ---------- Flagged Scans Panel ---------- */
+    function renderFlagsPanel() {
+      const stats = computeFlagStats(flagsCache);
+      document.getElementById("flag-stat-open").textContent = stats.open;
+      document.getElementById("flag-stat-high").textContent = stats.highSeverity;
+      document.getElementById("flag-stat-resolved").textContent = stats.resolvedToday;
+      renderFlagsList(flagsCache, document.getElementById("flags-list"), {
+        onReview: (id) => reviewFlag(id),
+        onDismiss: (id) => dismissFlag(id)
+      });
+    }
+
     /* ---------- Reports Panel ---------- */
     async function loadReports() {
-      // Destroy any existing Chart instances before re-rendering,
-      // otherwise Chart.js throws "Canvas is already in use".
       ["pie-chart", "bar-chart"].forEach((id) => {
         const existing = Chart.getChart(id);
         if (existing) existing.destroy();

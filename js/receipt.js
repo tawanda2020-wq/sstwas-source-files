@@ -40,11 +40,11 @@ export async function renderReceipt(transaction, container) {
     .join("");
 
   container.innerHTML = `
-    <div id="receipt-print" class="bg-white p-6 rounded-2xl shadow-md max-w-sm mx-auto text-[13px] text-[#4A5568]">
+    <div id="receipt-print" class="bg-white p-6 rounded-2xl shadow-md max-w-sm mx-auto text-[13px] text-[#4A5568] border border-gray-50">
       <div class="text-center mb-4">
         <img src="${logoUrl}" alt="${storeName}" class="h-10 mx-auto mb-2" onerror="this.style.display='none'" />
-        <h2 class="text-lg font-bold text-[#1A73E8]">${storeName}</h2>
-        <p class="text-xs">Digital Receipt</p>
+        <h2 class="text-lg font-bold text-[#0D1B2A]">${storeName}</h2>
+        <p class="text-xs text-gray-400">Digital Receipt</p>
       </div>
       <div class="border-t border-b border-dashed border-gray-300 py-2 mb-2 text-xs">
         <p><span class="font-semibold">Txn Ref:</span> ${transaction.paymentRef}</p>

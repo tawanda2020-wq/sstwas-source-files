@@ -1,24 +1,80 @@
 /* cashier.css — desktop/tablet dashboard tokens shared with admin.css */
 :root {
   --color-primary: #1A73E8;
+  --color-primary-dark: #0D5FC9;
   --color-success: #00C853;
   --color-warning: #FF8F00;
   --color-error: #D32F2F;
   --color-dark-navy: #0D1B2A;
   --color-near-white: #F7F9FC;
   --color-mid-grey: #4A5568;
-  --radius-card: 16px;
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 18px;
+  --shadow-card: 0 2px 14px rgba(13, 27, 42, 0.06);
+  --shadow-card-hover: 0 14px 34px rgba(13, 27, 42, 0.14);
+  --shadow-modal: 0 24px 70px rgba(13, 27, 42, 0.35);
+
+  --grad-page: radial-gradient(circle at 0% 0%, rgba(26,115,232,0.35) 0%, rgba(26,115,232,0) 40%),
+               radial-gradient(circle at 100% 0%, rgba(0,200,83,0.18) 0%, rgba(0,200,83,0) 45%),
+               linear-gradient(180deg, #0D1B2A 0%, #101F33 100%);
+  --grad-primary: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
+  --grad-success: linear-gradient(135deg, #22D978 0%, #00C853 100%);
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--color-dark-navy);
+  font-family: var(--font-body);
+  background: var(--grad-page);
+  background-attachment: fixed;
   color: var(--color-mid-grey);
 }
 
-.card { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+.font-display { font-family: var(--font-display); font-style: italic; }
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(13, 27, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(13, 27, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent, var(--grad-primary));
+}
+
+.btn-grad {
+  background: var(--grad-primary);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(26,115,232,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-grad:active { transform: scale(0.97); }
+
+.btn-success-grad {
+  background: var(--grad-success);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(0,200,83,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-success-grad:active { transform: scale(0.97); }
 
 .row-new {
   animation: rowFlash 1.6s ease-out 2;
@@ -30,9 +86,34 @@ body {
 
 .modal-backdrop {
   background: rgba(13, 27, 42, 0.6);
+  backdrop-filter: blur(3px);
 }
 .modal-panel {
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-modal);
 }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.45s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > * { animation: fadeUp 0.4s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > *:nth-child(1){animation-delay:.02s}
+.stagger > *:nth-child(2){animation-delay:.06s}
+.stagger > *:nth-child(3){animation-delay:.10s}
+
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--color-warning);
+  animation: pulse 1.6s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.45; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(13,27,42,0.18); border-radius: 999px; }

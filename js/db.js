@@ -166,3 +166,37 @@ export function updateSettings(data) {
 export function clearAllTransactions() {
   return set(ref(db, "transactions"), null);
 }
+
+/* ------------------------- Shopper Sessions -------------------------- */
+// A "session" is one customer's live basket while they shop — written by
+// the customer app as the cart changes, so Admin/Cashier can see baskets
+// on the floor in real time (not just completed transactions).
+
+/** Live subscription to every shopper session (Admin "Shopper sessions"). */
+export function subscribeSessions(callback) {
+  return onValue(ref(db, "sessions"), (snap) => {
+    const val = snap.val() || {};
+    const list = Object.keys(val).map((id) => ({ id, ...val[id] }));
+    list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    callback(list);
+  });
+}
+
+/* ----------------------------- Flags ---------------------------------- */
+// Loss-prevention flags raised by the customer app for suspicious basket
+// activity (rapid voids, items added without a camera scan).
+
+/** Live subscription to every flag, newest first (Admin "Flagged scans"). */
+export function subscribeFlags(callback) {
+  return onValue(ref(db, "flags"), (snap) => {
+    const val = snap.val() || {};
+    const list = Object.keys(val).map((id) => ({ id, ...val[id] }));
+    list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    callback(list);
+  });
+}
+
+/** Marks a flag "reviewed" or "dismissed". */
+export function updateFlagStatus(flagId, status) {
+  return update(ref(db, `flags/${flagId}`), { status, resolvedAt: Date.now() });
+}

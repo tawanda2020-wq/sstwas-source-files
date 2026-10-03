@@ -1,38 +1,148 @@
-/* cashier.css — desktop/tablet dashboard tokens shared with admin.css */
+/* admin.css — back-office dashboard tokens shared visual language with
+   cashier.css. Tailwind (CDN) handles layout; this file holds brand tokens,
+   gradients, motion and native-app touches. */
+
 :root {
   --color-primary: #1A73E8;
+  --color-primary-dark: #0D5FC9;
   --color-success: #00C853;
   --color-warning: #FF8F00;
   --color-error: #D32F2F;
   --color-dark-navy: #0D1B2A;
   --color-near-white: #F7F9FC;
   --color-mid-grey: #4A5568;
-  --radius-card: 16px;
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 18px;
+  --shadow-card: 0 2px 14px rgba(13, 27, 42, 0.06);
+  --shadow-card-hover: 0 14px 34px rgba(13, 27, 42, 0.14);
+  --shadow-modal: 0 24px 70px rgba(13, 27, 42, 0.35);
+
+  --grad-sidebar: linear-gradient(195deg, #0D1B2A 0%, #11223A 55%, #0A1626 100%);
+  --grad-primary: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
+  --grad-success: linear-gradient(135deg, #22D978 0%, #00C853 100%);
+  --grad-warning: linear-gradient(135deg, #FFB547 0%, #FF8F00 100%);
+  --grad-error: linear-gradient(135deg, #F06161 0%, #D32F2F 100%);
+  --grad-page: radial-gradient(circle at 100% 0%, rgba(26,115,232,0.08) 0%, rgba(26,115,232,0) 45%),
+               linear-gradient(180deg, #F7F9FC 0%, #EEF2F8 100%);
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--color-dark-navy);
+  font-family: var(--font-body);
   color: var(--color-mid-grey);
 }
 
-.card { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+.font-display { font-family: var(--font-display); font-style: italic; }
 
-.row-new {
-  animation: rowFlash 1.6s ease-out 2;
+.admin-shell { background: var(--grad-page); }
+
+.sidebar { background: var(--grad-sidebar); }
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(13, 27, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-@keyframes rowFlash {
-  0% { background-color: #FFF3E0; }
-  100% { background-color: transparent; }
+.card-hover:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(13, 27, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent, var(--grad-primary));
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  border: 1px solid transparent;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.nav-btn.active {
+  background: linear-gradient(135deg, rgba(26,115,232,0.9), rgba(13,95,201,0.9));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(26,115,232,0.35);
+}
+
+.btn-grad {
+  background: var(--grad-primary);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(26,115,232,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-grad:active { transform: scale(0.97); }
 
 .modal-backdrop {
-  background: rgba(13, 27, 42, 0.6);
+  background: rgba(13, 27, 42, 0.55);
+  backdrop-filter: blur(3px);
 }
 .modal-panel {
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-modal);
+}
+
+.row-new { animation: rowFlash 1.6s ease-out 2; }
+@keyframes rowFlash {
+  0% { background-color: #FFF3E0; }
+  100% { background-color: transparent; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.45s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > * { animation: fadeUp 0.4s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > *:nth-child(1){animation-delay:.02s}
+.stagger > *:nth-child(2){animation-delay:.06s}
+.stagger > *:nth-child(3){animation-delay:.10s}
+.stagger > *:nth-child(4){animation-delay:.14s}
+.stagger > *:nth-child(n+5){animation-delay:.18s}
+
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse 1.6s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.45; }
+}
+
+.severity-high { background: #FDECEA; color: var(--color-error); }
+.severity-medium { background: #FFF4E5; color: var(--color-warning); }
+.severity-low { background: #EDF2FF; color: var(--color-primary); }
+
+.status-active { color: var(--color-success); }
+.status-flagged { color: var(--color-error); }
+.status-checkout { color: var(--color-primary); }
+.status-paid { color: #6B7280; }
+
+tr.flagged-row { background: #FEF6F5; }
+tr.flagged-row:hover { background: #FCEAE8; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(13,27,42,0.18); border-radius: 999px; }
+
+@media (max-width: 767px) {
+  .sidebar-mobile-open { transform: translateX(0) !important; }
 }

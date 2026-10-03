@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cashier Login - SSTWAS</title>
+<title>Cashier Login - Self Service Till</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/cashier.css" />
+<script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
-  <div class="card w-full max-w-sm p-8">
-    <img src="../assets/logo.png" alt="Store logo" class="h-10 mx-auto mb-4" onerror="this.style.display='none'" />
-    <h1 class="text-lg font-bold text-[#0D1B2A] text-center mb-1">Cashier Login</h1>
+  <div class="card w-full max-w-sm p-8 animate-fade-up">
+    <div class="w-12 h-12 rounded-full bg-[#EAF1FF] text-[#1A73E8] flex items-center justify-center mx-auto mb-4">
+      <i data-lucide="receipt" class="w-5 h-5"></i>
+    </div>
+    <img src="../assets/logo.png" alt="Store logo" class="h-8 mx-auto mb-3" onerror="this.style.display='none'" />
+    <h1 class="font-display italic text-xl text-[#0D1B2A] text-center mb-1">Cashier Login</h1>
     <p class="text-xs text-[#4A5568] text-center mb-6">Sign in to access the pending payments queue.</p>
 
     <form id="login-form" class="space-y-3">
-      <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 rounded-lg p-3 text-sm" />
+      <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:border-[#1A73E8] outline-none transition" />
       <div class="relative">
-  <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 rounded-lg p-3 text-sm pr-10" />
-  <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-    👁
-  </button>
-</div>
-      <button type="submit" id="login-btn" class="w-full bg-[#1A73E8] text-white font-bold py-3 rounded-lg">Login</button>
+        <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 rounded-xl p-3 text-sm pr-10 focus:border-[#1A73E8] outline-none transition" />
+        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+          <i data-lucide="eye" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <button type="submit" id="login-btn" class="w-full btn-grad font-bold py-3 rounded-xl">Login</button>
     </form>
     <p id="login-error" class="hidden text-xs text-[#D32F2F] text-center mt-3"></p>
   </div>
@@ -29,38 +36,40 @@
   <script type="module">
     import { signInStaff, getUserRole } from "../js/auth.js";
 
+    lucide.createIcons();
+
     document.getElementById("login-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const errorEl = document.getElementById("login-error");
-  const btn = document.getElementById("login-btn");
-  errorEl.classList.add("hidden");
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("login-error");
+      const btn = document.getElementById("login-btn");
+      errorEl.classList.add("hidden");
 
-  btn.disabled = true;
-  btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Verifying…`;
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Verifying…`;
 
-  try {
-    const cred = await signInStaff(email, password);
-    const role = await getUserRole(cred.user.uid);
-    if (role !== "cashier" && role !== "admin") {
-      throw new Error("This account is not authorised for the cashier dashboard.");
-    }
-    btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Redirecting…`;
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    errorEl.textContent = "Invalid email or password.";
-    errorEl.classList.remove("hidden");
-    btn.disabled = false;
-    btn.innerHTML = "Login";
-    console.error(err);
-  }
-});
+      try {
+        const cred = await signInStaff(email, password);
+        const role = await getUserRole(cred.user.uid);
+        if (role !== "cashier" && role !== "admin") {
+          throw new Error("This account is not authorised for the cashier dashboard.");
+        }
+        btn.innerHTML = `<svg class="inline w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Redirecting…`;
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errorEl.textContent = "Invalid email or password.";
+        errorEl.classList.remove("hidden");
+        btn.disabled = false;
+        btn.innerHTML = "Login";
+        console.error(err);
+      }
+    });
 
     document.getElementById("toggle-password").addEventListener("click", () => {
-  const input = document.getElementById("password");
-  input.type = input.type === "password" ? "text" : "password";
-});
+      const input = document.getElementById("password");
+      input.type = input.type === "password" ? "text" : "password";
+    });
   </script>
 </body>
 </html>

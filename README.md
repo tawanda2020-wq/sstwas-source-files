@@ -29,6 +29,7 @@ sstwas/
 │   ├── db.js
 │   ├── cart.js
 │   ├── scanner.js
+│   ├── session.js             <- Live shopper session tracking + loss-prevention flags
 │   ├── payment.js
 │   ├── receipt.js
 │   ├── cashier.js

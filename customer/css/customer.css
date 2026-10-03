@@ -1,10 +1,11 @@
 /* customer.css — design tokens + small overrides for the mobile customer app.
    Tailwind (CDN) handles layout/utility classes; this file holds the brand
-   tokens from the design spec and a few native-app touches Tailwind alone
-   can't express cleanly. */
+   tokens, gradients, motion and native-app touches Tailwind alone can't
+   express cleanly. */
 
 :root {
   --color-primary: #1A73E8;
+  --color-primary-dark: #0D5FC9;
   --color-success: #00C853;
   --color-warning: #FF8F00;
   --color-error: #D32F2F;
@@ -12,38 +13,85 @@
   --color-near-white: #F7F9FC;
   --color-mid-grey: #4A5568;
 
-  --radius-card: 16px;
-  --radius-btn: 8px;
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 20px;
+  --radius-btn: 14px;
+  --shadow-card: 0 2px 14px rgba(13, 27, 42, 0.06);
+  --shadow-card-hover: 0 10px 30px rgba(13, 27, 42, 0.12);
+  --shadow-modal: 0 20px 60px rgba(13, 27, 42, 0.22);
+
+  --grad-bg: radial-gradient(circle at 10% -10%, #E8F7F0 0%, rgba(232,247,240,0) 55%),
+             radial-gradient(circle at 100% 0%, #EAF1FF 0%, rgba(234,241,255,0) 50%),
+             linear-gradient(180deg, #FDFEFE 0%, #F7F9FC 100%);
+  --grad-primary: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
+  --grad-success: linear-gradient(135deg, #22D978 0%, #00C853 100%);
+  --grad-hero: linear-gradient(120deg, #0D5FC9 0%, #1A73E8 45%, #15B88A 100%);
 }
 
+* { -webkit-tap-highlight-color: transparent; }
+
 body {
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--color-near-white);
+  font-family: var(--font-body);
+  background: var(--grad-bg);
+  background-attachment: fixed;
   color: var(--color-mid-grey);
   max-width: 480px;
   margin: 0 auto;
-  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
+  position: relative;
 }
+
+.font-display { font-family: var(--font-display); font-style: italic; }
 
 .card {
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
+  border: 1px solid rgba(13, 27, 42, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+.card-hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
 
 .btn-primary {
-  background: var(--color-primary);
+  background: var(--grad-primary);
   color: #fff;
   border-radius: var(--radius-btn);
   font-weight: 700;
+  box-shadow: 0 8px 20px rgba(26, 115, 232, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.5; box-shadow: none; }
+
+.btn-ghost {
+  background: #fff;
+  border: 1px solid rgba(13, 27, 42, 0.1);
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.btn-ghost:active { transform: scale(0.97); }
+
+.chip {
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
 }
 
 #qr-reader {
   border-radius: var(--radius-card);
   overflow: hidden;
 }
+#qr-reader video { border-radius: var(--radius-card); }
 
 /* Pending-payment pulse indicator */
 .pulse-dot {
@@ -53,8 +101,67 @@ body {
   background: var(--color-warning);
   animation: pulse 1.4s ease-in-out infinite;
 }
-
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.6); opacity: 0.4; }
 }
+
+.pulse-ring {
+  position: relative;
+}
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid currentColor;
+  opacity: 0.5;
+  animation: ring 1.8s ease-out infinite;
+}
+@keyframes ring {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+/* Entrance motion */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.5s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > * { animation: fadeUp 0.45s cubic-bezier(.22,.9,.3,1) both; }
+.stagger > *:nth-child(1){animation-delay:.02s}
+.stagger > *:nth-child(2){animation-delay:.07s}
+.stagger > *:nth-child(3){animation-delay:.12s}
+.stagger > *:nth-child(4){animation-delay:.17s}
+.stagger > *:nth-child(5){animation-delay:.22s}
+.stagger > *:nth-child(6){animation-delay:.27s}
+.stagger > *:nth-child(n+7){animation-delay:.32s}
+
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: popIn 0.3s ease both; }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #eef1f6 25%, #f8fafc 37%, #eef1f6 63%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-card);
+}
+
+/* Custom scrollbar for the search results strip */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.badge-flagged {
+  background: #FDECEA;
+  color: var(--color-error);
+}
+.badge-active { background: #E6F9EE; color: var(--color-success); }

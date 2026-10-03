@@ -9,7 +9,10 @@ import {
   deleteProduct as dbDeleteProduct,
   getAllTransactions,
   getAllUsers,
-  setUserRecord
+  setUserRecord,
+  subscribeSessions,
+  subscribeFlags,
+  updateFlagStatus
 } from "./db.js";
 import {
   createUserWithEmailAndPassword,
@@ -198,6 +201,147 @@ export function exportTransactionsToCSV(txns, filename = "transactions.csv") {
   link.href = URL.createObjectURL(blob);
   link.download = filename;
   link.click();
+}
+
+/* ------------------------- Shopper Sessions -------------------------- */
+
+export function loadSessions(onUpdate) {
+  return subscribeSessions(onUpdate);
+}
+
+/** Basket-level stats for the Shopper Sessions stat strip. */
+export function computeSessionStats(sessions) {
+  const active = sessions.filter((s) => s.status === "active").length;
+  const flagged = sessions.filter((s) => s.status === "flagged").length;
+  const checkout = sessions.filter((s) => s.status === "checkout").length;
+  const live = sessions.filter((s) => s.status !== "paid");
+  const avgBasket = live.length
+    ? live.reduce((sum, s) => sum + (s.total || 0), 0) / live.length
+    : 0;
+  return { active, flagged, checkout, avgBasket, liveCount: live.length };
+}
+
+const SESSION_STATUS_LABEL = {
+  active: "active",
+  checkout: "checkout",
+  flagged: "flagged",
+  paid: "paid"
+};
+
+export function renderSessionsTable(sessions, tbodyEl, filter = "all") {
+  const filtered = filter === "all" ? sessions : sessions.filter((s) => s.status === filter);
+
+  if (filtered.length === 0) {
+    tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-gray-400">No shopper sessions ${filter === "all" ? "yet" : "in this view"}.</td></tr>`;
+    return;
+  }
+
+  tbodyEl.innerHTML = filtered
+    .map((s) => {
+      const summary = (s.items || []).map((i) => `${i.name} x${i.qty}`).join(" · ") || "Empty basket";
+      const started = s.startedAt ? new Date(s.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "-";
+      const status = SESSION_STATUS_LABEL[s.status] || s.status || "active";
+      const rowClass = s.status === "flagged" ? "flagged-row" : "";
+      const statusIcon = s.status === "flagged" ? "triangle-alert" : s.status === "paid" ? "check" : "circle";
+      return `
+        <tr class="border-b ${rowClass}" data-session-id="${s.id}">
+          <td class="py-2.5 px-3 font-semibold text-[#0D1B2A]">#${s.id.slice(-4).toUpperCase()}</td>
+          <td class="py-2.5 px-3">${s.label || "Guest"}</td>
+          <td class="py-2.5 px-3 text-gray-500 max-w-xs truncate" title="${summary}">${s.itemCount || 0} · ${summary}</td>
+          <td class="py-2.5 px-3 text-right font-semibold">$${(s.total || 0).toFixed(2)}</td>
+          <td class="py-2.5 px-3 text-center">${started}</td>
+          <td class="py-2.5 px-3 text-center status-${s.status || "active"} font-semibold">
+            <i data-lucide="${statusIcon}" class="inline w-3 h-3 mr-1"></i>${status}
+          </td>
+        </tr>`;
+    })
+    .join("");
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+export function exportSessionsToCSV(sessions, filename = "shopper-sessions.csv") {
+  const header = ["Basket", "Shopper", "Items", "Total", "Status", "Started"];
+  const rows = sessions.map((s) => [
+    s.id,
+    s.label || "",
+    (s.items || []).map((i) => `${i.name} x${i.qty}`).join(" | "),
+    (s.total || 0).toFixed(2),
+    s.status,
+    s.startedAt ? new Date(s.startedAt).toISOString() : ""
+  ]);
+  const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
+
+/* --------------------------- Flagged Scans ---------------------------- */
+
+export function loadFlags(onUpdate) {
+  return subscribeFlags(onUpdate);
+}
+
+export function computeFlagStats(flags) {
+  const open = flags.filter((f) => f.status === "open");
+  const highSeverity = open.filter((f) => f.severity === "high").length;
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const resolvedToday = flags.filter(
+    (f) => f.status !== "open" && f.resolvedAt && f.resolvedAt >= startOfDay.getTime()
+  ).length;
+  return { open: open.length, highSeverity, resolvedToday };
+}
+
+const REASON_LABEL = {
+  voided: "voided",
+  manual_entry: "skipped scan",
+  skipped_scan: "skipped scan"
+};
+
+export function renderFlagsList(flags, containerEl, { onReview, onDismiss }) {
+  const open = flags.filter((f) => f.status === "open");
+
+  if (open.length === 0) {
+    containerEl.innerHTML = `<div class="card p-8 text-center text-gray-400 text-sm">No open flags — the floor is clean right now.</div>`;
+    return;
+  }
+
+  containerEl.innerHTML = open
+    .map((f) => {
+      const time = f.createdAt ? new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+      return `
+        <div class="card card-hover p-4 flex items-center justify-between gap-4 flex-wrap animate-fade-up" data-flag-id="${f.id}">
+          <div class="min-w-0">
+            <p class="font-semibold text-[#0D1B2A] text-sm">${f.productName || "Unknown item"}</p>
+            <p class="text-xs text-gray-400 truncate">${f.detail || ""}</p>
+          </div>
+          <div class="text-xs text-gray-400 whitespace-nowrap">${f.basketLabel || ""} · ${time}</div>
+          <span class="severity-${f.severity || "low"} text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">${REASON_LABEL[f.reason] || f.reason}</span>
+          <div class="flex gap-2 ml-auto">
+            <button class="review-btn btn-grad text-xs font-semibold px-3 py-1.5 rounded-lg" data-id="${f.id}">Review</button>
+            <button class="dismiss-btn bg-gray-100 text-xs font-semibold px-3 py-1.5 rounded-lg text-gray-600" data-id="${f.id}">Dismiss</button>
+          </div>
+        </div>`;
+    })
+    .join("");
+
+  containerEl.querySelectorAll(".review-btn").forEach((btn) =>
+    btn.addEventListener("click", () => onReview(btn.dataset.id))
+  );
+  containerEl.querySelectorAll(".dismiss-btn").forEach((btn) =>
+    btn.addEventListener("click", () => onDismiss(btn.dataset.id))
+  );
+}
+
+export function reviewFlag(flagId) {
+  return updateFlagStatus(flagId, "reviewed");
+}
+
+export function dismissFlag(flagId) {
+  return updateFlagStatus(flagId, "dismissed");
 }
 
 /* ---------------------------- User Management ---------------------------- */
