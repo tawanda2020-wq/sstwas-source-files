@@ -50,7 +50,7 @@ export function renderProductTable(products, tbodyEl, { onEdit, onDelete, onTogg
   }
   tbodyEl.innerHTML = products
     .map((p) => {
-      const stockClass = p.stock > 10 ? "text-[#00C853]" : p.stock > 0 ? "text-[#FF8F00]" : "text-[#D32F2F]";
+      const stockClass = p.stock > 10 ? "text-[#16A34A]" : p.stock > 0 ? "text-[#D97706]" : "text-[#DC2626]";
       return `
         <tr class="border-b hover:bg-gray-50">
           <td class="py-2 px-3">${p.name}</td>
@@ -58,15 +58,15 @@ export function renderProductTable(products, tbodyEl, { onEdit, onDelete, onTogg
           <td class="py-2 px-3 text-right">$${Number(p.price).toFixed(2)}</td>
           <td class="py-2 px-3 text-right font-semibold ${stockClass}">${p.stock}</td>
           <td class="py-2 px-3 text-center">
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${p.active ? "bg-green-100 text-[#00C853]" : "bg-gray-200 text-gray-500"}">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${p.active ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-gray-200 text-gray-500"}">
               ${p.active ? "Active" : "Inactive"}
             </span>
           </td>
           <td class="py-2 px-3 text-center space-x-2 whitespace-nowrap">
-            <button data-action="qr" data-id="${p.id}" class="text-[#1A73E8] text-xs font-semibold">QR</button>
-            <button data-action="edit" data-id="${p.id}" class="text-[#1A73E8] text-xs font-semibold">Edit</button>
-            <button data-action="toggle" data-id="${p.id}" data-active="${p.active}" class="text-[#FF8F00] text-xs font-semibold">${p.active ? "Disable" : "Enable"}</button>
-            <button data-action="delete" data-id="${p.id}" class="text-[#D32F2F] text-xs font-semibold">Delete</button>
+            <button data-action="qr" data-id="${p.id}" class="text-[#155EEF] text-xs font-semibold">QR</button>
+            <button data-action="edit" data-id="${p.id}" class="text-[#155EEF] text-xs font-semibold">Edit</button>
+            <button data-action="toggle" data-id="${p.id}" data-active="${p.active}" class="text-[#D97706] text-xs font-semibold">${p.active ? "Disable" : "Enable"}</button>
+            <button data-action="delete" data-id="${p.id}" class="text-[#DC2626] text-xs font-semibold">Delete</button>
           </td>
         </tr>`;
     })
@@ -107,7 +107,7 @@ export function generateQR(productId, containerEl) {
     text: productId,
     width: 200,
     height: 200,
-    colorDark: "#0D1B2A",
+    colorDark: "#0A1F42",
     colorLight: "#FFFFFF"
   });
 }
@@ -162,7 +162,7 @@ export function renderCharts(data, pieCanvasEl, barCanvasEl) {
       datasets: [
         {
           data: Object.values(data.byMethod),
-          backgroundColor: ["#1A73E8", "#00C853", "#FF8F00"]
+          backgroundColor: ["#155EEF", "#16A34A", "#D97706"]
         }
       ]
     }
@@ -177,7 +177,7 @@ export function renderCharts(data, pieCanvasEl, barCanvasEl) {
         {
           label: "Revenue",
           data: Object.values(data.byDay),
-          backgroundColor: "#1A73E8"
+          backgroundColor: "#155EEF"
         }
       ]
     },
@@ -242,22 +242,20 @@ export function renderSessionsTable(sessions, tbodyEl, filter = "all") {
       const started = s.startedAt ? new Date(s.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "-";
       const status = SESSION_STATUS_LABEL[s.status] || s.status || "active";
       const rowClass = s.status === "flagged" ? "flagged-row" : "";
-      const statusIcon = s.status === "flagged" ? "triangle-alert" : s.status === "paid" ? "check" : "circle";
+      const statusIcon = s.status === "flagged" ? "ph-warning" : s.status === "paid" ? "ph-check-circle" : "ph-circle";
       return `
         <tr class="border-b ${rowClass}" data-session-id="${s.id}">
-          <td class="py-2.5 px-3 font-semibold text-[#0D1B2A]">#${s.id.slice(-4).toUpperCase()}</td>
+          <td class="py-2.5 px-3 font-semibold text-[#0A1F42]">#${s.id.slice(-4).toUpperCase()}</td>
           <td class="py-2.5 px-3">${s.label || "Guest"}</td>
           <td class="py-2.5 px-3 text-gray-500 max-w-xs truncate" title="${summary}">${s.itemCount || 0} · ${summary}</td>
           <td class="py-2.5 px-3 text-right font-semibold">$${(s.total || 0).toFixed(2)}</td>
           <td class="py-2.5 px-3 text-center">${started}</td>
           <td class="py-2.5 px-3 text-center status-${s.status || "active"} font-semibold">
-            <i data-lucide="${statusIcon}" class="inline w-3 h-3 mr-1"></i>${status}
+            <i class="ph-bold ${statusIcon} icon-xs align-[-1px] mr-1"></i>${status}
           </td>
         </tr>`;
     })
     .join("");
-
-  if (window.lucide) window.lucide.createIcons();
 }
 
 export function exportSessionsToCSV(sessions, filename = "shopper-sessions.csv") {
@@ -314,15 +312,18 @@ export function renderFlagsList(flags, containerEl, { onReview, onDismiss }) {
       const time = f.createdAt ? new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
       return `
         <div class="card card-hover p-4 flex items-center justify-between gap-4 flex-wrap animate-fade-up" data-flag-id="${f.id}">
-          <div class="min-w-0">
-            <p class="font-semibold text-[#0D1B2A] text-sm">${f.productName || "Unknown item"}</p>
-            <p class="text-xs text-gray-400 truncate">${f.detail || ""}</p>
+          <div class="min-w-0 flex items-center gap-3">
+            <span class="icon-circle w-9 h-9 severity-${f.severity || "low"} shrink-0"><i class="ph-duotone ph-flag icon-sm"></i></span>
+            <div>
+              <p class="font-semibold text-[#0A1F42] text-sm">${f.productName || "Unknown item"}</p>
+              <p class="text-xs text-gray-400 truncate">${f.detail || ""}</p>
+            </div>
           </div>
           <div class="text-xs text-gray-400 whitespace-nowrap">${f.basketLabel || ""} · ${time}</div>
           <span class="severity-${f.severity || "low"} text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">${REASON_LABEL[f.reason] || f.reason}</span>
           <div class="flex gap-2 ml-auto">
-            <button class="review-btn btn-grad text-xs font-semibold px-3 py-1.5 rounded-lg" data-id="${f.id}">Review</button>
-            <button class="dismiss-btn bg-gray-100 text-xs font-semibold px-3 py-1.5 rounded-lg text-gray-600" data-id="${f.id}">Dismiss</button>
+            <button class="review-btn btn-grad text-xs font-semibold px-3 py-1.5 flex items-center gap-1" data-id="${f.id}"><i class="ph-bold ph-check icon-xs"></i>Review</button>
+            <button class="dismiss-btn bg-gray-100 text-xs font-semibold px-3 py-1.5 rounded-full text-gray-600 flex items-center gap-1" data-id="${f.id}"><i class="ph-bold ph-x icon-xs"></i>Dismiss</button>
           </div>
         </div>`;
     })

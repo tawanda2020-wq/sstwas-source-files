@@ -8,32 +8,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 <style>
   body{
     font-family:'Inter',system-ui,sans-serif;
-    background: radial-gradient(circle at 50% 0%, #EAF1FF 0%, rgba(234,241,255,0) 50%), #F7F9FC;
+    background: radial-gradient(circle at 50% 0%, #DCEAFF 0%, rgba(220,234,255,0) 50%), #F5F8FF;
   }
   .font-display{font-family:'Fraunces',Georgia,serif;font-style:italic}
+  .icon-lg{font-size:28px;line-height:1}
   @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
   .animate-fade-up{animation:fadeUp .5s cubic-bezier(.22,.9,.3,1) both}
   .btn-primary {
-    background: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
-    box-shadow: 0 10px 24px rgba(26,115,232,0.32);
+    background: linear-gradient(135deg, #3B82F6 0%, #155EEF 55%, #0B3FB0 100%);
+    box-shadow: 0 10px 24px rgba(21,94,239,0.32);
   }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center text-center p-6">
   <div class="animate-fade-up">
-    <div class="w-16 h-16 rounded-full bg-[#EAF1FF] text-[#1A73E8] flex items-center justify-center mx-auto mb-4">
-      <i data-lucide="compass" class="w-7 h-7"></i>
+    <div class="w-16 h-16 rounded-full bg-[#EAF1FF] text-[#155EEF] flex items-center justify-center mx-auto mb-4">
+      <i class="ph-duotone ph-compass icon-lg"></i>
     </div>
-    <h1 class="font-display text-2xl text-[#0D1B2A] mb-2">Page not found</h1>
-    <p class="text-sm text-[#4A5568] mb-6">The page you're looking for doesn't exist.</p>
-    <a href="/" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+    <h1 class="font-display text-2xl text-[#0A1F42] mb-2">Page not found</h1>
+    <p class="text-sm text-[#5B6B82] mb-6">The page you're looking for doesn't exist.</p>
+    <a href="/" class="btn-primary text-white font-semibold px-6 py-3 rounded-full inline-flex items-center gap-2">
+      <i class="ph-bold ph-arrow-left"></i> Back to Home
     </a>
   </div>
-  <script>lucide.createIcons();</script>
 </body>
 </html>

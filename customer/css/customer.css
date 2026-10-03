@@ -1,33 +1,40 @@
 /* customer.css — design tokens + small overrides for the mobile customer app.
    Tailwind (CDN) handles layout/utility classes; this file holds the brand
    tokens, gradients, motion and native-app touches Tailwind alone can't
-   express cleanly. */
+   express cleanly.
+
+   Palette direction: confident saturated blue (inspired by Hopper's
+   #1878ec-style accent), blue-tinted neutrals, pill-shaped controls,
+   minimal shadow, generous whitespace. */
 
 :root {
-  --color-primary: #1A73E8;
-  --color-primary-dark: #0D5FC9;
-  --color-success: #00C853;
-  --color-warning: #FF8F00;
-  --color-error: #D32F2F;
-  --color-dark-navy: #0D1B2A;
-  --color-near-white: #F7F9FC;
-  --color-mid-grey: #4A5568;
+  --color-primary: #155EEF;
+  --color-primary-dark: #0B3FB0;
+  --color-primary-light: #EAF1FF;
+  --color-sky: #DCEAFF;
+  --color-ink: #0A1F42;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-dark-navy: #0A1F42;
+  --color-near-white: #F5F8FF;
+  --color-mid-grey: #5B6B82;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
-  --radius-card: 20px;
-  --radius-btn: 14px;
-  --shadow-card: 0 2px 14px rgba(13, 27, 42, 0.06);
-  --shadow-card-hover: 0 10px 30px rgba(13, 27, 42, 0.12);
-  --shadow-modal: 0 20px 60px rgba(13, 27, 42, 0.22);
+  --radius-card: 22px;
+  --radius-pill: 999px;
+  --shadow-card: 0 2px 16px rgba(10, 31, 66, 0.06);
+  --shadow-card-hover: 0 14px 34px rgba(10, 31, 66, 0.12);
+  --shadow-modal: 0 24px 64px rgba(10, 31, 66, 0.24);
 
-  --grad-bg: radial-gradient(circle at 10% -10%, #E8F7F0 0%, rgba(232,247,240,0) 55%),
-             radial-gradient(circle at 100% 0%, #EAF1FF 0%, rgba(234,241,255,0) 50%),
-             linear-gradient(180deg, #FDFEFE 0%, #F7F9FC 100%);
-  --grad-primary: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
-  --grad-success: linear-gradient(135deg, #22D978 0%, #00C853 100%);
-  --grad-hero: linear-gradient(120deg, #0D5FC9 0%, #1A73E8 45%, #15B88A 100%);
+  --grad-bg: radial-gradient(circle at 12% -10%, #E3EEFF 0%, rgba(227,238,255,0) 55%),
+             radial-gradient(circle at 100% 0%, #D9E8FF 0%, rgba(217,232,255,0) 50%),
+             linear-gradient(180deg, #FBFDFF 0%, #F5F8FF 100%);
+  --grad-primary: linear-gradient(135deg, #3B82F6 0%, #155EEF 55%, #0B3FB0 100%);
+  --grad-hero: linear-gradient(125deg, #0B3FB0 0%, #155EEF 45%, #4FA0FA 100%);
+  --grad-success: linear-gradient(135deg, #34D399 0%, #16A34A 100%);
 }
 
 * { -webkit-tap-highlight-color: transparent; }
@@ -49,7 +56,7 @@ body {
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(13, 27, 42, 0.04);
+  border: 1px solid rgba(10, 31, 66, 0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .card-hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
@@ -57,25 +64,29 @@ body {
 .btn-primary {
   background: var(--grad-primary);
   color: #fff;
-  border-radius: var(--radius-btn);
+  border-radius: var(--radius-pill);
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(26, 115, 232, 0.32);
+  box-shadow: 0 10px 24px rgba(21, 94, 239, 0.34);
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 .btn-primary:active { transform: scale(0.97); }
-.btn-primary:disabled { opacity: 0.5; box-shadow: none; }
+.btn-primary:disabled { opacity: 0.45; box-shadow: none; }
 
 .btn-ghost {
   background: #fff;
-  border: 1px solid rgba(13, 27, 42, 0.1);
-  border-radius: var(--radius-btn);
+  border: 1px solid rgba(10, 31, 66, 0.1);
+  border-radius: var(--radius-pill);
   font-weight: 600;
   transition: background 0.2s ease, transform 0.15s ease;
 }
 .btn-ghost:active { transform: scale(0.97); }
 
+.pill-field {
+  border-radius: var(--radius-pill);
+}
+
 .chip {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-weight: 600;
   transition: all 0.2s ease;
 }
@@ -86,6 +97,13 @@ body {
   justify-content: center;
   border-radius: 999px;
 }
+
+/* Phosphor icon sizing (font-based, not SVG) */
+.icon-xs { font-size: 14px; line-height: 1; }
+.icon-sm { font-size: 16px; line-height: 1; }
+.icon-md { font-size: 20px; line-height: 1; }
+.icon-lg { font-size: 26px; line-height: 1; }
+.icon-xl { font-size: 34px; line-height: 1; }
 
 #qr-reader {
   border-radius: var(--radius-card);
@@ -106,24 +124,6 @@ body {
   50% { transform: scale(1.6); opacity: 0.4; }
 }
 
-.pulse-ring {
-  position: relative;
-}
-.pulse-ring::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  border: 2px solid currentColor;
-  opacity: 0.5;
-  animation: ring 1.8s ease-out infinite;
-}
-@keyframes ring {
-  0% { transform: scale(0.9); opacity: 0.6; }
-  100% { transform: scale(1.25); opacity: 0; }
-}
-
-/* Entrance motion */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
@@ -156,12 +156,12 @@ body {
   border-radius: var(--radius-card);
 }
 
-/* Custom scrollbar for the search results strip */
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-.badge-flagged {
-  background: #FDECEA;
-  color: var(--color-error);
+.badge-flagged { background: #FEE2E2; color: var(--color-error); }
+.badge-active { background: #DCFCE7; color: var(--color-success); }
+
+.hero-blue {
+  background: var(--grad-hero);
 }
-.badge-active { background: #E6F9EE; color: var(--color-success); }

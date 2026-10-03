@@ -9,29 +9,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/customer.css" />
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
 
   <header class="flex items-center justify-between p-4">
     <span class="w-9"></span>
-    <h1 class="font-semibold text-[#0D1B2A] text-sm">Receipt</h1>
-    <a href="../index.html" title="Home" class="icon-circle w-9 h-9 bg-white card text-[#4A5568]">
-      <i data-lucide="house" class="w-4 h-4"></i>
+    <h1 class="font-semibold text-[#0A1F42] text-sm">Receipt</h1>
+    <a href="../index.html" title="Home" class="icon-circle w-9 h-9 bg-white card text-[#5B6B82]">
+      <i class="ph-duotone ph-house icon-sm"></i>
     </a>
   </header>
 
   <div class="px-4 text-center mb-2 animate-fade-up">
-    <div class="icon-circle w-14 h-14 bg-[#E6F9EE] text-[#00C853] mx-auto mb-3 animate-pop">
-      <i data-lucide="check" class="w-7 h-7"></i>
+    <div class="icon-circle w-14 h-14 bg-[#DCFCE7] text-[#16A34A] mx-auto mb-3 animate-pop">
+      <i class="ph-bold ph-check icon-xl"></i>
     </div>
-    <p class="font-display italic text-2xl text-[#0D1B2A]">Thanks for shopping.</p>
+    <p class="font-display italic text-2xl text-[#0A1F42]">Thanks for shopping.</p>
   </div>
 
   <!-- Confirmed toast (shown briefly when arriving from a cash approval) -->
-  <div id="confirmed-toast" class="hidden mx-4 mb-3 bg-green-50 border border-green-100 text-[#00C853] text-sm font-semibold rounded-xl p-3 text-center flex items-center justify-center gap-2">
-    <i data-lucide="badge-check" class="w-4 h-4"></i> Payment Confirmed! Your receipt is ready.
+  <div id="confirmed-toast" class="hidden mx-4 mb-3 bg-[#DCFCE7] border border-green-100 text-[#16A34A] text-sm font-semibold rounded-xl p-3 text-center flex items-center justify-center gap-2">
+    <i class="ph-duotone ph-seal-check icon-sm"></i> Payment Confirmed! Your receipt is ready.
   </div>
 
   <main class="flex-1 px-4 mt-2">
@@ -40,9 +40,9 @@
 
   <footer class="p-4 space-y-2">
     <button id="download-btn" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
-      <i data-lucide="download" class="w-4 h-4"></i> Download Receipt
+      <i class="ph-bold ph-download-simple icon-sm"></i> Download Receipt
     </button>
-    <a href="index.html" class="block text-center text-sm font-semibold text-[#4A5568] py-2">Done — Start a New Shop</a>
+    <a href="index.html" class="block text-center text-sm font-semibold text-[#5B6B82] py-2">Done — Start a New Shop</a>
   </footer>
 
   <script type="module">
@@ -51,8 +51,6 @@
     import { renderReceipt, downloadReceiptImage } from "../js/receipt.js";
     import { clearCart } from "../js/cart.js";
 
-    lucide.createIcons();
-
     const params = new URLSearchParams(window.location.search);
     const txnId = params.get("txnId");
     const cameFromCash = params.get("confirmed") === "1";
@@ -60,19 +58,18 @@
     async function load() {
       if (!txnId) {
         document.getElementById("receipt-container").innerHTML =
-          `<p class="text-center text-sm text-[#4A5568] mt-10">No transaction found.</p>`;
+          `<p class="text-center text-sm text-[#5B6B82] mt-10">No transaction found.</p>`;
         return;
       }
       const snap = await get(ref(db, `transactions/${txnId}`));
       if (!snap.exists()) {
         document.getElementById("receipt-container").innerHTML =
-          `<p class="text-center text-sm text-[#4A5568] mt-10">Transaction not found.</p>`;
+          `<p class="text-center text-sm text-[#5B6B82] mt-10">Transaction not found.</p>`;
         return;
       }
       const txn = snap.val();
       if (cameFromCash || txn.paymentMethod === "CASH") {
         document.getElementById("confirmed-toast").classList.remove("hidden");
-        lucide.createIcons();
       }
       await renderReceipt(txn, document.getElementById("receipt-container"));
       clearCart(); // cart only cleared once a receipt is actually shown

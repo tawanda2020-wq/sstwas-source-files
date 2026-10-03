@@ -9,34 +9,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/cashier.css" />
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body class="min-h-screen flex flex-col items-center justify-center p-6 relative">
+
+  <a href="../index.html" class="absolute top-6 left-6 w-10 h-10 rounded-full bg-white/10 border border-white/15 text-white flex items-center justify-center hover:bg-white/15 transition">
+    <i class="ph-bold ph-arrow-left icon-sm"></i>
+  </a>
+
   <div class="card w-full max-w-sm p-8 animate-fade-up">
-    <div class="w-12 h-12 rounded-full bg-[#EAF1FF] text-[#1A73E8] flex items-center justify-center mx-auto mb-4">
-      <i data-lucide="receipt" class="w-5 h-5"></i>
+    <div class="w-12 h-12 rounded-full bg-[#EAF1FF] text-[#155EEF] flex items-center justify-center mx-auto mb-4">
+      <i class="ph-duotone ph-receipt icon-md"></i>
     </div>
     <img src="../assets/logo.png" alt="Store logo" class="h-8 mx-auto mb-3" onerror="this.style.display='none'" />
-    <h1 class="font-display italic text-xl text-[#0D1B2A] text-center mb-1">Cashier Login</h1>
-    <p class="text-xs text-[#4A5568] text-center mb-6">Sign in to access the pending payments queue.</p>
+    <h1 class="font-display italic text-xl text-[#0A1F42] text-center mb-1">Cashier Login</h1>
+    <p class="text-xs text-[#5B6B82] text-center mb-6">Sign in to access the pending payments queue.</p>
 
     <form id="login-form" class="space-y-3">
-      <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:border-[#1A73E8] outline-none transition" />
+      <input id="email" type="email" required placeholder="Email" class="w-full border border-gray-200 pill-field p-3 px-5 text-sm focus:border-[#155EEF] outline-none transition" />
       <div class="relative">
-        <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 rounded-xl p-3 text-sm pr-10 focus:border-[#1A73E8] outline-none transition" />
-        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-          <i data-lucide="eye" class="w-4 h-4"></i>
+        <input id="password" type="password" required placeholder="Password" class="w-full border border-gray-200 pill-field p-3 px-5 pr-11 text-sm focus:border-[#155EEF] outline-none transition" />
+        <button type="button" id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+          <i class="ph-bold ph-eye icon-sm"></i>
         </button>
       </div>
-      <button type="submit" id="login-btn" class="w-full btn-grad font-bold py-3 rounded-xl">Login</button>
+      <button type="submit" id="login-btn" class="w-full btn-grad font-bold py-3">Login</button>
     </form>
-    <p id="login-error" class="hidden text-xs text-[#D32F2F] text-center mt-3"></p>
+    <p id="login-error" class="hidden text-xs text-[#DC2626] text-center mt-3"></p>
   </div>
 
   <script type="module">
     import { signInStaff, getUserRole } from "../js/auth.js";
-
-    lucide.createIcons();
 
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();

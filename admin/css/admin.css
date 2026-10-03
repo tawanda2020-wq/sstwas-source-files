@@ -1,32 +1,38 @@
 /* admin.css — back-office dashboard tokens shared visual language with
    cashier.css. Tailwind (CDN) handles layout; this file holds brand tokens,
-   gradients, motion and native-app touches. */
+   gradients, motion and native-app touches.
+
+   Palette direction: confident saturated blue throughout (not gray/navy) —
+   sidebar is a deep blue gradient, accents stay in the blue family, and
+   green/amber/red are reserved strictly for semantic states. */
 
 :root {
-  --color-primary: #1A73E8;
-  --color-primary-dark: #0D5FC9;
-  --color-success: #00C853;
-  --color-warning: #FF8F00;
-  --color-error: #D32F2F;
-  --color-dark-navy: #0D1B2A;
-  --color-near-white: #F7F9FC;
-  --color-mid-grey: #4A5568;
+  --color-primary: #155EEF;
+  --color-primary-dark: #0B3FB0;
+  --color-primary-light: #EAF1FF;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-dark-navy: #0A1F42;
+  --color-near-white: #F5F8FF;
+  --color-mid-grey: #5B6B82;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
-  --radius-card: 18px;
-  --shadow-card: 0 2px 14px rgba(13, 27, 42, 0.06);
-  --shadow-card-hover: 0 14px 34px rgba(13, 27, 42, 0.14);
-  --shadow-modal: 0 24px 70px rgba(13, 27, 42, 0.35);
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --shadow-card: 0 2px 16px rgba(10, 31, 66, 0.06);
+  --shadow-card-hover: 0 16px 36px rgba(10, 31, 66, 0.14);
+  --shadow-modal: 0 28px 70px rgba(10, 31, 66, 0.4);
 
-  --grad-sidebar: linear-gradient(195deg, #0D1B2A 0%, #11223A 55%, #0A1626 100%);
-  --grad-primary: linear-gradient(135deg, #1E88F0 0%, #1A73E8 45%, #0D5FC9 100%);
-  --grad-success: linear-gradient(135deg, #22D978 0%, #00C853 100%);
-  --grad-warning: linear-gradient(135deg, #FFB547 0%, #FF8F00 100%);
-  --grad-error: linear-gradient(135deg, #F06161 0%, #D32F2F 100%);
-  --grad-page: radial-gradient(circle at 100% 0%, rgba(26,115,232,0.08) 0%, rgba(26,115,232,0) 45%),
-               linear-gradient(180deg, #F7F9FC 0%, #EEF2F8 100%);
+  --grad-sidebar: linear-gradient(195deg, #0A1F42 0%, #123B7A 55%, #081833 100%);
+  --grad-primary: linear-gradient(135deg, #3B82F6 0%, #155EEF 55%, #0B3FB0 100%);
+  --grad-success: linear-gradient(135deg, #34D399 0%, #16A34A 100%);
+  --grad-warning: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+  --grad-error: linear-gradient(135deg, #F87171 0%, #DC2626 100%);
+  --grad-page: radial-gradient(circle at 100% 0%, rgba(21,94,239,0.10) 0%, rgba(21,94,239,0) 45%),
+               linear-gradient(180deg, #F5F8FF 0%, #ECF2FD 100%);
 }
 
 body {
@@ -44,7 +50,7 @@ body {
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(13, 27, 42, 0.05);
+  border: 1px solid rgba(10, 31, 66, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card-hover:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
@@ -55,7 +61,7 @@ body {
   border-radius: var(--radius-card);
   background: #fff;
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(13, 27, 42, 0.05);
+  border: 1px solid rgba(10, 31, 66, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); }
@@ -73,24 +79,28 @@ body {
   gap: 10px;
   transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
   border: 1px solid transparent;
+  border-radius: var(--radius-pill);
 }
-.nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.nav-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 .nav-btn.active {
-  background: linear-gradient(135deg, rgba(26,115,232,0.9), rgba(13,95,201,0.9));
+  background: linear-gradient(135deg, rgba(59,130,246,0.95), rgba(11,63,176,0.95));
   color: #fff;
-  box-shadow: 0 6px 18px rgba(26,115,232,0.35);
+  box-shadow: 0 8px 20px rgba(21,94,239,0.35);
 }
 
 .btn-grad {
   background: var(--grad-primary);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(26,115,232,0.3);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 18px rgba(21,94,239,0.3);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .btn-grad:active { transform: scale(0.97); }
 
+.pill-field { border-radius: var(--radius-pill); }
+
 .modal-backdrop {
-  background: rgba(13, 27, 42, 0.55);
+  background: rgba(10, 31, 66, 0.55);
   backdrop-filter: blur(3px);
 }
 .modal-panel {
@@ -101,7 +111,7 @@ body {
 
 .row-new { animation: rowFlash 1.6s ease-out 2; }
 @keyframes rowFlash {
-  0% { background-color: #FFF3E0; }
+  0% { background-color: #EAF1FF; }
   100% { background-color: transparent; }
 }
 
@@ -128,21 +138,24 @@ body {
   50% { transform: scale(1.6); opacity: 0.45; }
 }
 
-.severity-high { background: #FDECEA; color: var(--color-error); }
-.severity-medium { background: #FFF4E5; color: var(--color-warning); }
-.severity-low { background: #EDF2FF; color: var(--color-primary); }
+.severity-high { background: #FEE2E2; color: var(--color-error); }
+.severity-medium { background: #FEF3C7; color: var(--color-warning); }
+.severity-low { background: #EAF1FF; color: var(--color-primary); }
 
 .status-active { color: var(--color-success); }
 .status-flagged { color: var(--color-error); }
 .status-checkout { color: var(--color-primary); }
 .status-paid { color: #6B7280; }
 
-tr.flagged-row { background: #FEF6F5; }
-tr.flagged-row:hover { background: #FCEAE8; }
+tr.flagged-row { background: #FEF2F2; }
+tr.flagged-row:hover { background: #FEE2E2; }
+
+/* Phosphor icon sizing (font-based, not SVG) */
+.icon-xs { font-size: 14px; line-height: 1; }
+.icon-sm { font-size: 16px; line-height: 1; }
+.icon-md { font-size: 20px; line-height: 1; }
+.icon-lg { font-size: 26px; line-height: 1; }
+.icon-xl { font-size: 34px; line-height: 1; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(13,27,42,0.18); border-radius: 999px; }
-
-@media (max-width: 767px) {
-  .sidebar-mobile-open { transform: translateX(0) !important; }
-}
+::-webkit-scrollbar-thumb { background: rgba(10,31,66,0.18); border-radius: 999px; }

@@ -24,13 +24,13 @@ export function renderPendingTable(txns, tbodyEl, onRowClick) {
     .map((t) => {
       const elapsedMin = Math.floor((Date.now() - t.createdAt) / 60000);
       return `
-        <tr class="border-b hover:bg-amber-50 cursor-pointer transition" data-txn-id="${t.id}">
-          <td class="py-2 px-3 font-semibold text-[#1A73E8]">${t.paymentRef}</td>
+        <tr class="border-b hover:bg-[#FEF3C7]/40 cursor-pointer transition" data-txn-id="${t.id}">
+          <td class="py-2 px-3 font-semibold text-[#155EEF]">${t.paymentRef}</td>
           <td class="py-2 px-3 text-center">${(t.items || []).length}</td>
           <td class="py-2 px-3 text-right font-bold">$${t.total.toFixed(2)}</td>
           <td class="py-2 px-3 text-center">${elapsedMin}m ago</td>
           <td class="py-2 px-3 text-center">
-            <button class="confirm-btn bg-[#00C853] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:opacity-90" data-txn-id="${t.id}">
+            <button class="confirm-btn bg-[#16A34A] text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-90" data-txn-id="${t.id}">
               Confirm Payment
             </button>
           </td>
